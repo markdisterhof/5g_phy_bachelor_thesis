@@ -1,5 +1,5 @@
 import numpy as np
-from nr_phy_sync import nr_sync_signals as nrss
+import nrSyncSignals as nrss
 
 def map_pss(data, ssb_dim, beta = 1.):
     """Mapping of PSS within an SS/PBCH block as per

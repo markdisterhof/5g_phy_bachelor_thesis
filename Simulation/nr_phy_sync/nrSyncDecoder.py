@@ -1,6 +1,6 @@
 import numpy as np
-from nr_phy_sync import nr_sync_signals as nrss
-from nr_phy_sync import nr_ssb
+import nrSyncSignals as nrss
+import nrSSB
 
 def decode_pss(received_data, ssb_dim):
     """Find SSB with highest crosscorrelation to undistorted PSS available in resource grid 
@@ -20,7 +20,7 @@ def decode_pss(received_data, ssb_dim):
     
     for (i,pss_i) in enumerate(nid2_candidates):
         rgrid_mask = np.zeros(rec_pss_sym.shape, dtype=complex)
-        rgrid_mask[:ssb_dim['k'], :ssb_dim['l']] += nr_ssb.map_pss(pss_i, ssb_dim)
+        rgrid_mask[:ssb_dim['k'], :ssb_dim['l']] += nrSSB.map_pss(pss_i, ssb_dim)
         
         for l in range(received_data.shape[1]):
             for k in range(received_data.shape[0]):
