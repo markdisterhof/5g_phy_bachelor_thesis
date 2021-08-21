@@ -88,7 +88,7 @@ def map_pbch(data_pbch, data_dmrs, ssb_dim, beta_pbch = 1., beta_dmrs = 1.):
                 i_pbch += 1
     return mask
 
-def ssb(ssb_dim, N_ID1, N_ID2, L__max, ssb_idx):
+def ssb(ssb_dim, N_ID1, N_ID2, L__max, ssb_idx, pbch_data):
     """Generate SS/PBCH block 
 
     Args:
@@ -122,7 +122,7 @@ def ssb(ssb_dim, N_ID1, N_ID2, L__max, ssb_idx):
 
     #pbch and dmrs mapping
     data_pbch = nrss.pbch(
-        np.random.randint(2, size=864),
+        pbch_data,
         L__max,
         N_ID_Cell,
         ssb_idx)
@@ -211,9 +211,10 @@ def map_ssb(res_grid, ssb, k_offs, l_offs):
     res_grid[k_offs:len(ssb)+k_offs, l_offs:len(ssb[0,:])+l_offs] = ssb
     return res_grid
 
+def get_sync_resource_grid(N_RB, N_ID1, N_ID2, k_ssb, mu, f,  shared_spectr = False, paired_spectr = False):
+    return get_sync_resource_grid(N_RB, N_ID1, N_ID2, k_ssb, mu, f,np.random.randint(2, size=864) , shared_spectr = False, paired_spectr = False)
 
-
-def get_sync_resource_grid(N_RB, N_ID1, N_ID2, k_ssb, mu, f, shared_spectr = False, paired_spectr = False):
+def get_sync_resource_grid(N_RB, N_ID1, N_ID2, k_ssb, mu, f, pbch_data, shared_spectr = False, paired_spectr = False):
     """Generate a complete resource grid with SSBs
 
     Args:
@@ -245,7 +246,7 @@ def get_sync_resource_grid(N_RB, N_ID1, N_ID2, k_ssb, mu, f, shared_spectr = Fal
     res_grid = np.zeros(shape=( N_SC, N_SYMB), dtype=complex)
 
     for idx in idxs:
-        ssb_i = ssb(ssb_dim, N_ID1, N_ID2, L__max, idx)
+        ssb_i = ssb(ssb_dim, N_ID1, N_ID2, L__max, idx, pbch_data)
         res_grid = map_ssb(res_grid, ssb_i, k_ssb, idx)
     return res_grid
 
