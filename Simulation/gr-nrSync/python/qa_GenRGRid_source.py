@@ -39,12 +39,10 @@ class qa_GenRGRid_source(gr_unittest.TestCase):
         # check data
         b = np.load('../../syncrgrid_20_0_1_0_1_0_T_F.npy').flatten(order='F')
         src1 = GenRGRid_source(20,0,1,0,1,0,True,False)
-        dst0 = blocks.stream_to_vector(len(b),len(b))
-        dst1 = blocks.vector_sink_c(len(b))
+        dst0 = blocks.vector_sink_c()
         tb.connect(src1, dst0)
-        tb.connect(dst0, dst1)
         tb.run()
-        a = dst1.data()
+        a = dst0.data()
         
         np.testing.assert_array_equal(a,b)
 

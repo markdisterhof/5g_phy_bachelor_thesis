@@ -38,10 +38,11 @@ class GenRGRid_source(gr.sync_block):
             f, 
             shared_spectr, 
             paired_spectr))
+        
         gr.sync_block.__init__(self,
             name="GenRGRid_source",
             in_sig=None,
-            out_sig=[np.complex64])
+            out_sig=[(np.complex64, out_len)])
         
         self.N_RB = N_RB
         self.N_ID1 = N_ID1
@@ -56,7 +57,7 @@ class GenRGRid_source(gr.sync_block):
     def work(self, input_items, output_items):
         out = output_items[0]
         # <+signal processing here+>
-        rgrid = nrSSB.get_sync_resource_grid(
+        rgrid = np.array(nrSSB.get_sync_resource_grid(
             self.N_RB, 
             self.N_ID1, 
             self.N_ID2, 
@@ -64,6 +65,6 @@ class GenRGRid_source(gr.sync_block):
             self.mu, 
             self.f, 
             self.shared_spectr, 
-            self.paired_spectr).flatten(order='F')
+            self.paired_spectr).flatten(order='F'), np.complex64)
         out[:] += rgrid
         return len(output_items[0])
