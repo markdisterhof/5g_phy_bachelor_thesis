@@ -1,6 +1,0 @@
-{
-    "python.analysis.extraPaths": [
-        "./Simulation/nr_phy_sync",
-        "./Simulation/gr-nr_sync/python"
-    ]
-}
