@@ -22,7 +22,7 @@
 
 import numpy as np
 from gnuradio import gr
-from nr_phy_sync import nrSSB
+from Simulation.nr_phy_sync import nrSSB
 
 class GenRGRid_c(gr.sync_block):
     """
