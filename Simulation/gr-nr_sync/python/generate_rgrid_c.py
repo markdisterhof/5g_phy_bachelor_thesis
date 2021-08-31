@@ -21,7 +21,7 @@
 
 
 import numpy as np
-from Simulation.nr_phy_sync import nrSSB
+from nr_phy_sync import nrSSB
 from gnuradio import gr
 
 class generate_rgrid_c(gr.sync_block):
