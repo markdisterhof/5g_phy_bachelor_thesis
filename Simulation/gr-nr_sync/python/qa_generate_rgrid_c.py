@@ -22,6 +22,7 @@
 from gnuradio import gr, gr_unittest
 from gnuradio import blocks
 from generate_rgrid_c import generate_rgrid_c
+import numpy as np
 
 class qa_generate_rgrid_c(gr_unittest.TestCase):
 
@@ -33,9 +34,16 @@ class qa_generate_rgrid_c(gr_unittest.TestCase):
 
     def test_001_t(self):
         # set up fg
+        src = generate_rgrid_c(N_RB=20,N_ID1=0,N_ID2=1,k_ssb=0,mu=1,f=0,pbch_data=None,shared_spectr=True,paired_spectr=False)
+        dst = blocks.vector_sink_c(vlen=len(src.resource_grid))
+        #
+        self.tb.connect(src,dst)
         self.tb.run()
         # check data
-
+        a = dst.data()
+        print(a)
+        b = np.load('syncrgrid_20_0_1_0_1_0_T_F.npy').flatten(order='F')
+        np.testing.assert_array_almost_equal(a,b)
 
 if __name__ == '__main__':
     gr_unittest.run(qa_generate_rgrid_c)
