@@ -51,6 +51,7 @@ parameters:
 outputs:
 - label: Out
   dtype: complex
+  vlen: ${ 12 * N_RB }
 
 #  'file_format' specifies the version of the GRC yml format used in the file
 #  and should usually not be changed.

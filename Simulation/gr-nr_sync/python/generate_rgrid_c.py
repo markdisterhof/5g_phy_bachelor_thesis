@@ -41,7 +41,7 @@ class generate_rgrid_c(gr.sync_block):
     def work(self, input_items, output_items):
         out = output_items[0]
         # <+signal processing here+>
-        out[:] += self.resource_grid[:,self.idx]
+        out[:] = self.resource_grid[:,self.idx]
         self.idx = (self.idx + 1) % len(self.resource_grid[0])
         # 
         return len(output_items[0])

@@ -8,7 +8,7 @@ __pycache__/
 
 # Distribution / packaging
 .Python
-build/
+*/build/
 develop-eggs/
 dist/
 downloads/
@@ -132,3 +132,6 @@ Meeting/*
 Präsentation/*
 Simulation/.vscode/
 Recherchen/*
+.vscode/launch.json
+Simulation/nr_sync_simulation.py
+Simulation/gr-nr_sync/build
