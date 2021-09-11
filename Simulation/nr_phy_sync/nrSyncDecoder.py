@@ -1,9 +1,7 @@
 from typing import Union
 import numpy as np
-from numpy.core.fromnumeric import size
-from nr_phy_sync import nrSyncSignals
-from nr_phy_sync import nrSSB
-from pyphysim.modulators import OFDM
+from nr_phy_sync import nrSyncSignals, nrSSB
+from pyphysim.modulators import OFDM, QPSK
 
 
 def decode_pss(received_data, ssb_dim):
@@ -37,21 +35,23 @@ def decode_pss(received_data, ssb_dim):
                 
     return  np.unravel_index(np.argmax(corr, axis=None), corr.shape)
 
-def pss_coarse_time_frequency_corr(fft_size: int, received_data: Union[np.ndarray, list], threshold: float, threshold_filter_down_spampling_factor: int):
+def pss_coarse_time_frequency_corr(fft_size: int, received_data: Union[np.ndarray, list], threshold: float, threshold_filter_down_spampling_factor: int, ret_mat: False):
     '''
     todo doccccc
     fft_size >= 240
     returns nid2, 
     '''
-    #filter idxs which are under given threshold for range of fftsize 
-    can_idxs = np.array(range(len(received_data-fft_size)))
-    for ind in range(0, len(can_idxs)):
-        if np.average(received_data[ind:ind+fft_size:threshold_filter_down_spampling_factor]) < threshold:
+    #filter idxs which have avg for range of fftsize under given threshold 
+    can_idxs = np.array(range(len(received_data)-fft_size))
+    for ind in range(0, len(can_idxs), ):
+        if np.average(np.abs(received_data[ind:ind+fft_size:threshold_filter_down_spampling_factor])) < threshold:
             can_idxs[ind] = -1
-    idxs = [can_idxs != -1]
+    idxs = can_idxs[can_idxs != -1]
 
     ofdm = OFDM(fft_size,0, fft_size)
-    corr = np.zeros(shape=(3,fft_size-239, len(received_data)-fft_size+1),dtype=complex )
+
+    corr = np.ones(shape=(3,fft_size-239, len(received_data)-fft_size +1),dtype=np.float64) * np.inf
+
     for i_NID_2 in range(corr.shape[0]):
         pss_i_data = nrSyncSignals.pss(N_ID2 = i_NID_2)
         ssb_dim ={
@@ -62,15 +62,15 @@ def pss_coarse_time_frequency_corr(fft_size: int, received_data: Union[np.ndarra
         for i_f_offs in range(corr.shape[1]):
             candidate = ofdm.modulate(#np.fft.ifft(#
                 np.roll(pss_i,i_f_offs))
-            for i_t_offs in range(corr.shape[2]):
+            for i_t_offs in idxs:
                 corr[i_NID_2,i_f_offs,i_t_offs] = np.abs(np.sum( np.square(received_data[i_t_offs:i_t_offs+len(candidate)]) - np.square(candidate)))
-    
-    return np.unravel_index(np.argmin(corr, axis=None), corr.shape)
+    corr = np.divide(1,corr)
+    correc = np.unravel_index(np.argmax(corr, axis=None), corr.shape)
+    if ret_mat:
+        return (correc, corr)
+    return correc
 
-def split_array_at_threshold():
-    pass
-
-def decode_sss(sss_data, nid2, ssb_dim):
+def decode_sss(sss_data, nid2):
     """Extract N_ID_1 through crosscorrelation
 
     Args:
@@ -88,6 +88,24 @@ def decode_sss(sss_data, nid2, ssb_dim):
     corr = np.zeros(len(sss_candidates),dtype=complex)
     
     for i,sss_i in enumerate(sss_candidates):
-        corr[i] = np.multiply(sss_i, sss_data).sum()
+        corr[i] = np.abs(np.multiply(sss_i, sss_data).sum())
     
-    return max(np.unravel_index(np.argmax(corr, axis=None), corr.shape))
+    return int(np.argmax(corr, axis=None))
+
+def decode_pbch(pbch_data: np.ndarray, L__max: int, N_ID_Cell: int, i_SSB: int):
+    # get bits from complex symbols
+    b = nrSyncSignals.inv_sym_qpsk(pbch_data)
+    # descramble that
+    M_bit = len(b)
+    if not M_bit == 864:
+        raise ValueError('PBCH payload data must be 864 symbols')
+    v = None
+    if L__max == 4:
+        v = i_SSB % 2**2
+    else:
+        v = i_SSB % 2**3
+
+    c = nrSyncSignals.prsg((1+v) * M_bit, N_ID_Cell)
+    scr = [c[i + v * M_bit] for i in range(M_bit)]
+    
+    return np.logical_xor(b,scr)
