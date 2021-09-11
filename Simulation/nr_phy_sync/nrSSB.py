@@ -132,7 +132,7 @@ def ssb(ssb_dim, N_ID1, N_ID2, L__max, ssb_idx, pbch_data):
     ssb += map_pbch(data_pbch, data_dmrs, ssb_dim)
     return ssb
 
-def unmap_pss(received_data, ssb_dim):
+def unmap_pss(received_data : np.ndarray, ssb_dim: dict = None):
     """Unmap PSS from given resource grid
 
     Args:
@@ -142,6 +142,15 @@ def unmap_pss(received_data, ssb_dim):
     Returns:
         [complex]: PSS data
     """
+    if ssb_dim is None:
+        ssb_dim = {
+            'l' : 4,
+            'k' : 240
+        }
+    ssb_dim['k_offset'] = ssb_dim.get('k_offset', default=0)
+    ssb_dim['l_offset'] = ssb_dim.get('l_offset', default=0)
+
+
     ssb_mask = np.zeros((ssb_dim['k'], ssb_dim['l']), dtype = int)
     ssb_mask += map_pss(np.ones(127), ssb_dim)
     mask_rgrid = np.zeros(received_data.shape)
@@ -151,7 +160,7 @@ def unmap_pss(received_data, ssb_dim):
         np.nonzero(
             np.multiply(mask_rgrid, received_data))]
 
-def unmap_sss(received_data, ssb_dim):
+def unmap_sss(received_data : np.ndarray, ssb_dim: dict = None):
     """Unmap SSS from given resource grid
 
     Args:
@@ -161,6 +170,14 @@ def unmap_sss(received_data, ssb_dim):
     Returns:
         [complex]: SSS data
     """
+    if ssb_dim is None:
+        ssb_dim = {
+            'l' : 4,
+            'k' : 240
+        }
+    ssb_dim['k_offset'] = ssb_dim.get('k_offset', default=0)
+    ssb_dim['l_offset'] = ssb_dim.get('l_offset', default=0)
+
     ssb_mask = np.zeros((ssb_dim['k'], ssb_dim['l']), dtype=complex)
     ssb_mask += map_sss(np.ones(127, dtype=complex), ssb_dim)
     mask_rgrid = np.zeros(received_data.shape, dtype=complex)
@@ -169,7 +186,7 @@ def unmap_sss(received_data, ssb_dim):
         np.nonzero(
             np.multiply(mask_rgrid, received_data))]
 
-def unmap_pbch(received_data, ssb_dim):
+def unmap_pbch(received_data : np.ndarray, ssb_dim: dict = None):
     """Unmap PBCH and DM-RS from given resource grid
 
     Args:
@@ -179,6 +196,14 @@ def unmap_pbch(received_data, ssb_dim):
     Returns:
         tuple: PBCH and DM-RS data
     """
+    if ssb_dim is None:
+        ssb_dim = {
+            'l' : 4,
+            'k' : 240
+        }
+    ssb_dim['k_offset'] = ssb_dim.get('k_offset', default=0)
+    ssb_dim['l_offset'] = ssb_dim.get('l_offset', default=0)
+    
     ssb_mask_pbch = np.zeros((ssb_dim['k'], ssb_dim['l']), dtype = int)
     ssb_mask_dmrs = np.zeros((ssb_dim['k'], ssb_dim['l']), dtype = int)
 
@@ -364,4 +389,3 @@ def get_cp_length(mu, l = 0,  extended_cp = False):
             return 144 * kappa * 2**(-1 * mu) + 16 * kappa
         else:
             return 144 * kappa * 2**(-1 * mu)
-

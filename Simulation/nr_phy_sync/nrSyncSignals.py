@@ -1,5 +1,4 @@
 import numpy as np
-from pyphysim.modulators import QPSK # todo
 
 def prsg(n, c_init):
     """Compute c as per
@@ -131,7 +130,7 @@ def dmrs(i_ssb, N_ID_Cell, L__max, n_hf = 0):
     return r
 
 
-def pbch(b, L__max, N_ID_Cell, ssb_idx):
+def pbch(b, L__max, N_ID_Cell, i_SSB):
     """Generate physical broadcast channel sequence
     
     TS 38.211 V16.2.0 (2020-07)
@@ -142,7 +141,7 @@ def pbch(b, L__max, N_ID_Cell, ssb_idx):
         b ([int]): PBCH payload bits
         L__max (int): Maximum number of candidate SS/PBCH blocks in a half frame
         N_ID_Cell (int): Cell identity ID
-        ssb_idx (int): Candidate SS/PBCH block index
+        i_SSB (int): Candidate SS/PBCH block index
 
     Raises:
         ValueError: PBCH payload data must be 864 symbols
@@ -157,39 +156,35 @@ def pbch(b, L__max, N_ID_Cell, ssb_idx):
 
     v = None
     if L__max == 4:
-        v = ssb_idx % 4
+        v = i_SSB % 2**2
     else:
-        v = ssb_idx % 8
+        v = i_SSB % 2**3
 
     c = prsg((1+v) * M_bit, N_ID_Cell)
 
     b_ = [(b[i] + c[i + v * M_bit]) % 2 for i in range(M_bit)]
 
-    d_PBCH = bit_qpsk(b_)
+    d_PBCH = sym_qpsk(b_)
     return d_PBCH
 
-def bit_qpsk(b):
+def sym_qpsk(b):
     """Modulate a list of bits with QPSK as per
 
     TS 38.211 V16.2.0 (2020-07) 5.1.3
 
     Args:
         b ([int]): List of bits to modulate
-
-    Raises:
-        ValueError: len(b) must be an even number
-
-    Returns:
-        [type]: [description]
     """    
-    n = 2
-    if len(b) % 2:
-        raise ValueError('len(b) must be an even number')
 
-    v = [2**i for i in range(n)]
-    syms = np.array(
-        [np.multiply(v, b[i:i+n]).sum() for i in range(0,len(b),n)], 
-        dtype=int)
-    return QPSK().modulate(syms)
+    return np.array(
+        [(1-2*b[2*i]+1j*(1-2*b[2*i+1]))/np.sqrt(2) for i in range(len(b)//2)],
+        dtype=complex)
 
-    
+def inv_sym_qpsk(c):
+    b_ = np.array(
+        [
+            [int(np.round(np.real(i)*np.sqrt(2))),int(np.round(np.imag(i)*np.sqrt(2)))]
+            for i in c]
+        ,dtype=int
+        ).flatten()
+    return np.array([(1-b_i)//2 for b_i in b_], dtype=int)
