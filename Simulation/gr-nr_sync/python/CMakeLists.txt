@@ -32,7 +32,11 @@ endif()
 GR_PYTHON_INSTALL(
     FILES
     __init__.py
-    generate_rgrid_c.py DESTINATION ${GR_PYTHON_DIR}/nr_sync
+    generate_rgrid_c.py
+    decode_sss_ci.py
+    unmap_ssb_cc.py
+    pbch_descramble_ci.py
+    ssb_detector_cc.py DESTINATION ${GR_PYTHON_DIR}/nr_sync
 )
 
 ########################################################################
@@ -43,3 +47,7 @@ include(GrTest)
 set(GR_TEST_TARGET_DEPS gnuradio-nr_sync)
 set(GR_TEST_PYTHON_DIRS ${CMAKE_BINARY_DIR}/swig)
 GR_ADD_TEST(qa_generate_rgrid_c ${PYTHON_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/qa_generate_rgrid_c.py)
+GR_ADD_TEST(qa_decode_sss_ci ${PYTHON_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/qa_decode_sss_ci.py)
+GR_ADD_TEST(qa_unmap_ssb_cc ${PYTHON_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/qa_unmap_ssb_cc.py)
+GR_ADD_TEST(qa_pbch_descramble_ci ${PYTHON_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/qa_pbch_descramble_ci.py)
+GR_ADD_TEST(qa_ssb_detector_cc ${PYTHON_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/qa_ssb_detector_cc.py)

@@ -17,7 +17,10 @@
 # along with GNU Radio; see the file COPYING.  If not, write to
 # the Free Software Foundation, Inc., 51 Franklin Street,
 # Boston, MA 02110-1301, USA.
-
 install(FILES
-    nr_sync_generate_rgrid_c.block.yml DESTINATION share/gnuradio/grc/blocks
+    nr_sync_generate_rgrid_c.block.yml
+    nr_sync_decode_sss_ci.block.yml
+    nr_sync_unmap_ssb_cc.block.yml
+    nr_sync_pbch_descramble_ci.block.yml
+    nr_sync_ssb_detector_cc.block.yml DESTINATION share/gnuradio/grc/blocks
 )
