@@ -301,8 +301,8 @@ def get_ssb_idxs(candidate_idxs, mu, shared_spectr):
     if shared_spectr:
         if (len(candidate_idxs)==10 and mu == 0) or (len(candidate_idxs)==20 and mu == 1):
             return candidate_idxs[:8]
-    else:
-        return candidate_idxs
+
+    return candidate_idxs
 
 
 def get_ssb_candidate_idx(mu: int, f: int, ssca=False, paired=False):
@@ -377,8 +377,10 @@ def get_ssb_candidate_idx(mu: int, f: int, ssca=False, paired=False):
             i = np.array([8,12,16,20,32,36,40,44])
             n = np.array([0,1,2,3,5,6,7,8])
             n *= 56
-    
-    return np.array([[a + b for a in i] for b in n], dtype=int).flatten()
+    can_idxs = np.array([[a + b for a in i] for b in n], dtype=int).flatten()
+    if can_idxs is None:
+        can_idxs = np.array([], dtype=int)
+    return can_idxs
 
 def get_cp_length(mu, l = 0,  extended_cp = False):
     kappa = 1#64
