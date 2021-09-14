@@ -94,7 +94,7 @@ def decode_sss(sss_data, nid2):
 
 def decode_pbch(pbch_data: np.ndarray, L__max: int, N_ID_Cell: int, i_SSB: int):
     # get bits from complex symbols
-    b = nrSyncSignals.inv_sym_qpsk(pbch_data)
+    b = nrSyncSignals.inv_sym_qpsk(np.array(pbch_data,dtype=complex))
     # descramble that
     M_bit = len(b)
     if not M_bit == 864:

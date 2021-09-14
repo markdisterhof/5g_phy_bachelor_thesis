@@ -16,10 +16,10 @@ def prsg(n, c_init):
     """
     c = np.zeros(n)
     N_c = 1600
-    x_1 = np.array([1])
-    x_1.resize(n + len(c) + N_c)
-    x_2 = np.array(np.flip([int(x) for x in bin(c_init)[2:]]))
-    x_2.resize((n + len(c) + N_c))
+    x_1 = np.array([1]+[0]*(n + len(c) + N_c-1))
+    x_2 = np.zeros((n + len(c) + N_c))
+    x_2_c = np.flip([int(x) for x in bin(c_init)[2:]])
+    x_2[:len(x_2_c)] = x_2_c
         
     for n_i in range(n + N_c - 31):
         x_1[n_i+31] = (x_1[n_i+3] + x_1[n_i]) % 2 
@@ -181,10 +181,9 @@ def sym_qpsk(b):
         dtype=complex)
 
 def inv_sym_qpsk(c):
+    c = np.array(c,dtype=complex).flatten() #weird python type error in gr
     b_ = np.array(
-        [
-            [int(np.round(np.real(i)*np.sqrt(2))),int(np.round(np.imag(i)*np.sqrt(2)))]
-            for i in c]
+        [[int(np.round(np.real(i)*np.sqrt(2))),int(np.round(np.imag(i)*np.sqrt(2)))] for i in c]
         ,dtype=int
         ).flatten()
     return np.array([(1-b_i)//2 for b_i in b_], dtype=int)
