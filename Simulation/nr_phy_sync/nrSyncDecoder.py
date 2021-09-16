@@ -1,6 +1,6 @@
 from typing import Union
 import numpy as np
-from nr_phy_sync import nrSyncSignals, nrSSB
+import nrSyncSignals, nrSSB
 from pyphysim.modulators import OFDM, QPSK
 
 

@@ -1,5 +1,5 @@
 import numpy as np
-import nr_phy_sync.nrSyncSignals as nrss
+import nrSyncSignals as nrss
 
 def map_pss(data, ssb_dim, beta = 1.):
     """Mapping of PSS within an SS/PBCH block as per
@@ -147,8 +147,8 @@ def unmap_pss(received_data : np.ndarray, ssb_dim: dict = None):
             'l' : 4,
             'k' : 240
         }
-    ssb_dim['k_offset'] = ssb_dim.get('k_offset', default=0)
-    ssb_dim['l_offset'] = ssb_dim.get('l_offset', default=0)
+    ssb_dim['k_offset'] = ssb_dim.get('k_offset', 0)
+    ssb_dim['l_offset'] = ssb_dim.get('l_offset', 0)
 
 
     ssb_mask = np.zeros((ssb_dim['k'], ssb_dim['l']), dtype = int)
@@ -175,8 +175,8 @@ def unmap_sss(received_data : np.ndarray, ssb_dim: dict = None):
             'l' : 4,
             'k' : 240
         }
-    ssb_dim['k_offset'] = ssb_dim.get('k_offset', default=0)
-    ssb_dim['l_offset'] = ssb_dim.get('l_offset', default=0)
+    ssb_dim['k_offset'] = ssb_dim.get('k_offset', 0)
+    ssb_dim['l_offset'] = ssb_dim.get('l_offset', 0)
 
     ssb_mask = np.zeros((ssb_dim['k'], ssb_dim['l']), dtype=complex)
     ssb_mask += map_sss(np.ones(127, dtype=complex), ssb_dim)
@@ -201,8 +201,8 @@ def unmap_pbch(received_data : np.ndarray, ssb_dim: dict = None):
             'l' : 4,
             'k' : 240
         }
-    ssb_dim['k_offset'] = ssb_dim.get('k_offset', default=0)
-    ssb_dim['l_offset'] = ssb_dim.get('l_offset', default=0)
+    ssb_dim['k_offset'] = ssb_dim.get('k_offset', 0)
+    ssb_dim['l_offset'] = ssb_dim.get('l_offset', 0)
     
     ssb_mask_pbch = np.zeros((ssb_dim['k'], ssb_dim['l']), dtype = int)
     ssb_mask_dmrs = np.zeros((ssb_dim['k'], ssb_dim['l']), dtype = int)
