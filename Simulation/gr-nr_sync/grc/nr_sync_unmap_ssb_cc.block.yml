@@ -23,7 +23,7 @@ parameters:
 inputs:
 - label: ssb_symbols
   dtype: complex
-  vlen: 4*240
+  vlen: 960 # 240 *4
 
 outputs:
 - label: sss_symbols
