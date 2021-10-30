@@ -1,20 +1,19 @@
-id: nr_sync_decode_sss_ci
-label: decode_sss_ci
+id: nr_sync_sss_decode
+label: sss_decode
 category: '[nr_sync]'
 
 templates:
   imports: import nr_sync
-  make: nr_sync.decode_sss_ci(${N_ID2})
+  make: nr_sync.sss_decode()
 
 #  Make one 'parameters' list entry for every parameter you want settable from the GUI.
 #     Keys include:
-#     * id (makes the value accessible as \$keyname, e.g. in the make entry)
+#     * id (makes the value accessible as keyname, e.g. in the make entry)
 #     * label (label shown in the GUI)
 #     * dtype (e.g. int, float, complex, byte, short, xxx_vector, ...)
+#     * default
 parameters:
-- id: N_ID2
-  label: N_ID2
-  dtype: int
+
 
 #  Make one 'inputs' list entry per input and one 'outputs' list entry per output.
 #  Keys include:
@@ -24,7 +23,12 @@ parameters:
 #      * vlen (optional - data stream vector length. Default is 1)
 #      * optional (optional - set to 1 for optional inputs. Default is 0)
 inputs:
-- label: sss_data
+- id: N_ID2
+  label: N_ID2
+  dtype: int
+
+- id: sss_data
+  label: sss_data
   dtype: complex
   vlen: 127
 
