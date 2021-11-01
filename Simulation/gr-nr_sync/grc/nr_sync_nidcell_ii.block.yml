@@ -1,10 +1,10 @@
-id: nr_sync_pss_detector
-label: pss_detector
+id: nr_sync_nidcell_ii
+label: nidcell_ii
 category: '[nr_sync]'
 
 templates:
   imports: import nr_sync
-  make: nr_sync.pss_detector(${N_RB}, ${L__max}, ${threshold})
+  make: nr_sync.nidcell_ii()
 
 #  Make one 'parameters' list entry for every parameter you want settable from the GUI.
 #     Keys include:
@@ -13,17 +13,6 @@ templates:
 #     * dtype (e.g. int, float, complex, byte, short, xxx_vector, ...)
 #     * default
 parameters:
-- id: N_RB
-  label: N_RB
-  dtype: int
-
-- id: L__max
-  label: L__max
-  dtype: int
-
-- id: threshold
-  label: threshold
-  dtype: float
 
 #  Make one 'inputs' list entry per input and one 'outputs' list entry per output.
 #  Keys include:
@@ -33,18 +22,18 @@ parameters:
 #      * vlen (optional - data stream vector length. Default is 1)
 #      * optional (optional - set to 1 for optional inputs. Default is 0)
 inputs:
-- label: In
-  dtype: complex
-  vlen: ${ 12 * N_RB }
-
-outputs:
 - label: N_ID2
   dtype: int
-- label: SSB
-  dtype: complex
-  vlen: 960
-- label: i_ssb
+  vlen: 1
+- label: N_ID1
   dtype: int
+  vlen: 1
+
+
+outputs:
+- label: N_ID_Cell
+  dtype: int
+  vlen: 1
 
 #  'file_format' specifies the version of the GRC yml format used in the file
 #  and should usually not be changed.

@@ -7,26 +7,28 @@
 #
 
 from gnuradio import gr, gr_unittest
-from gnuradio import blocks
-from sss_decode import sss_decode
-import numpy
-from nr_phy_sync import nrSyncSignals
+# from gnuradio import blocks
+from sss_decode_ci import sss_decode_ci
 
-class qa_sss_decode(gr_unittest.TestCase):
+class qa_sss_decode_ci(gr_unittest.TestCase):
 
     def setUp(self):
         self.tb = gr.top_block()
 
     def tearDown(self):
         self.tb = None
-        
+
+    def test_instance(self):
+        # FIXME: Test will fail until you pass sensible arguments to the constructor
+        instance = sss_decode_ci()
+
     def run_dec(self, nid1,nid2):
         print('testing nid1,nid2', nid1,nid2)
         self.setUp()
         sss_data = numpy.array(nrSyncSignals.sss(nid1, nid2),dtype=numpy.complex64)
         src_0 = blocks.vector_source_i([nid2],False)
         src_1 = blocks.vector_source_c(sss_data,False,127)
-        dec = sss_decode()
+        dec = sss_decode_ci()
         dst = blocks.vector_sink_i(1)
         
         self.tb.connect(src_0,(dec,0))
@@ -46,4 +48,4 @@ class qa_sss_decode(gr_unittest.TestCase):
 
 
 if __name__ == '__main__':
-    gr_unittest.run(qa_sss_decode)
+    gr_unittest.run(qa_sss_decode_ci)

@@ -7,13 +7,10 @@
 #
 
 from gnuradio import gr, gr_unittest
-from gnuradio import blocks
-from pss_detector import pss_detector
-from generate_rgrid_c import generate_rgrid_c
-import numpy as np
-from nr_phy_sync import nrSSB
+# from gnuradio import blocks
+from pss_detector_cc import pss_detector_cc
 
-class qa_pss_detector(gr_unittest.TestCase):
+class qa_pss_detector_cc(gr_unittest.TestCase):
 
     def setUp(self):
         self.tb = gr.top_block()
@@ -22,7 +19,7 @@ class qa_pss_detector(gr_unittest.TestCase):
         self.tb = None
 
     def test_instance(self):
-        instance = pss_detector(20,8,80.)
+        instance = pss_detector_cc(20,8,80.)
 
     def test_001_descriptive_test_name(self):
         nrb = 30
@@ -41,7 +38,7 @@ class qa_pss_detector(gr_unittest.TestCase):
         # set up fg
         flat_src = blocks.vector_source_c(src_data, False)
         src = blocks.stream_to_vector(8, nrb*12)
-        instance = pss_detector(nrb,lmax,80.)
+        instance = pss_detector_cc(nrb,lmax,80.)
         nid2_sink = blocks.vector_sink_i()
         ssb_sink = blocks.vector_sink_c(240)
         issb_sink = blocks.vector_sink_i()
@@ -58,9 +55,8 @@ class qa_pss_detector(gr_unittest.TestCase):
         #self.assertEqual(0, issb_sink.data())
         print(ssb_sink.data())
         self.assertComplexTuplesAlmostEqual(ssb.flatten(order='F'), ssb_sink.data())
-        
 
 
 
 if __name__ == '__main__':
-    gr_unittest.run(qa_pss_detector)
+    gr_unittest.run(qa_pss_detector_cc)

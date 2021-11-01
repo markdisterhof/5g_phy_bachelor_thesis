@@ -8,9 +8,10 @@ templates:
 
 #  Make one 'parameters' list entry for every parameter you want settable from the GUI.
 #     Keys include:
-#     * id (makes the value accessible as \$keyname, e.g. in the make entry)
+#     * id (makes the value accessible as keyname, e.g. in the make entry)
 #     * label (label shown in the GUI)
 #     * dtype (e.g. int, float, complex, byte, short, xxx_vector, ...)
+#     * default
 parameters:
 - id: nu
   label: nu
@@ -41,7 +42,7 @@ outputs:
 - label: dmrs_symbols
   dtype: complex
   vlen: 144
-  
+
 #  'file_format' specifies the version of the GRC yml format used in the file
 #  and should usually not be changed.
 file_format: 1

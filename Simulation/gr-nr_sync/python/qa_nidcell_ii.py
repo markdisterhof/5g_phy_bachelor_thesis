@@ -8,9 +8,9 @@
 
 from gnuradio import gr, gr_unittest
 # from gnuradio import blocks
-from n_id_cell import n_id_cell
+from nidcell_ii import nidcell_ii
 
-class qa_n_id_cell(gr_unittest.TestCase):
+class qa_nidcell_ii(gr_unittest.TestCase):
 
     def setUp(self):
         self.tb = gr.top_block()
@@ -20,7 +20,7 @@ class qa_n_id_cell(gr_unittest.TestCase):
 
     def test_instance(self):
         # FIXME: Test will fail until you pass sensible arguments to the constructor
-        instance = n_id_cell()
+        instance = nidcell_ii()
 
     def test_001_descriptive_test_name(self):
         # set up fg
@@ -29,4 +29,4 @@ class qa_n_id_cell(gr_unittest.TestCase):
 
 
 if __name__ == '__main__':
-    gr_unittest.run(qa_n_id_cell)
+    gr_unittest.run(qa_nidcell_ii)

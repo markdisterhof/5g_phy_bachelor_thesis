@@ -1,32 +1,29 @@
-id: nr_sync_ssb_detector_cc
-label: ssb_detector_cc
+id: nr_sync_pss_detector_cc
+label: pss_detector_cc
 category: '[nr_sync]'
 
 templates:
   imports: import nr_sync
-  make: nr_sync.ssb_detector_cc(${n_rb}, ${mu}, ${f}, ${shared_spectr}, ${paired_spectr})
+  make: nr_sync.pss_detector_cc(${N_RB}, ${L__max}, ${threshold})
 
 #  Make one 'parameters' list entry for every parameter you want settable from the GUI.
 #     Keys include:
-#     * id (makes the value accessible as \$keyname, e.g. in the make entry)
+#     * id (makes the value accessible as keyname, e.g. in the make entry)
 #     * label (label shown in the GUI)
 #     * dtype (e.g. int, float, complex, byte, short, xxx_vector, ...)
+#     * default
 parameters:
 - id: N_RB
   label: N_RB
   dtype: int
-- id: mu
-  label: mu
+
+- id: L__max
+  label: L__max
   dtype: int
-- id: f
-  label: f
-  dtype: int
-- id: shared_spectr
-  label: Shared Spectrum
-  dtype: bool
-- id: paired_spectr
-  label: Paired Spectrum
-  dtype: bool
+
+- id: threshold
+  label: threshold
+  dtype: float
 
 #  Make one 'inputs' list entry per input and one 'outputs' list entry per output.
 #  Keys include:
@@ -36,18 +33,18 @@ parameters:
 #      * vlen (optional - data stream vector length. Default is 1)
 #      * optional (optional - set to 1 for optional inputs. Default is 0)
 inputs:
-- label: ...
-  domain: ...
-  dtype: ...
-  vlen: ...
-  optional: ...
+- label: In
+  dtype: complex
+  vlen: ${ 12 * N_RB }
 
 outputs:
-- label: ...
-  domain: ...
-  dtype: ...
-  vlen: ...
-  optional: ...
+- label: N_ID2
+  dtype: int
+- label: SSB
+  dtype: complex
+  vlen: 960
+- label: i_ssb
+  dtype: int
 
 #  'file_format' specifies the version of the GRC yml format used in the file
 #  and should usually not be changed.

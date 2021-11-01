@@ -9,18 +9,15 @@
 
 import numpy
 from gnuradio import gr
-from nr_phy_sync import nrSyncDecoder
 
-
-class pss_detector(gr.basic_block):
+class pss_detector_cc(gr.basic_block):
     """
-    docstring for block pss_detector
+    docstring for block pss_detector_cc
     """
-
     def __init__(self, N_RB, L__max, threshold):
         gr.basic_block.__init__(self,
-                                name="pss_detector",
-                                in_sig=[(numpy.complex64, N_RB*12)],
+            name="pss_detector_cc",
+                            in_sig=[(numpy.complex64, N_RB*12)],
                                 # nid2, ssb, i_ssb
                                 out_sig=[(numpy.int32, (1,)), (numpy.complex64, 240*4), (numpy.int32, (1,))])
         self.N_RB = N_RB

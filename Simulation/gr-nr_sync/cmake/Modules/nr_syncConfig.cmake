@@ -1,4 +1,5 @@
-INCLUDE(FindPkgConfig)
+find_package(PkgConfig)
+
 PKG_CHECK_MODULES(PC_NR_SYNC nr_sync)
 
 FIND_PATH(

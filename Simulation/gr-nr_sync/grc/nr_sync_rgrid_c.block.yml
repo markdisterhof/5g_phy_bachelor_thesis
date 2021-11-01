@@ -1,16 +1,17 @@
-id: nr_sync_generate_rgrid_c
-label: generate_rgrid_c
+id: nr_sync_rgrid_c
+label: rgrid_c
 category: '[nr_sync]'
 
 templates:
   imports: import nr_sync
-  make: nr_sync.generate_rgrid_c(${N_RB}, ${N_ID1}, ${N_ID2}, ${k_ssb}, ${mu}, ${f}, ${pbch_data}, ${shared_spectr}, ${paired_spectr})
+  make: nr_sync.rgrid_c(${N_RB}, ${N_ID1}, ${N_ID2}, ${k_ssb}, ${mu}, ${f}, ${pbch_data}, ${shared_spectr}, ${paired_spectr})
 
 #  Make one 'parameters' list entry for every parameter you want settable from the GUI.
 #     Keys include:
-#     * id (makes the value accessible as \$keyname, e.g. in the make entry)
+#     * id (makes the value accessible as keyname, e.g. in the make entry)
 #     * label (label shown in the GUI)
 #     * dtype (e.g. int, float, complex, byte, short, xxx_vector, ...)
+#     * default
 parameters:
 - id: N_RB
   label: N_RB

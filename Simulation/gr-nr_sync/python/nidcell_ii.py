@@ -10,13 +10,13 @@
 import numpy
 from gnuradio import gr
 
-class n_id_cell(gr.sync_block):
+class nidcell_ii(gr.sync_block):
     """
-    docstring for block n_id_cell
+    docstring for block nidcell_ii
     """
     def __init__(self):
         gr.sync_block.__init__(self,
-            name="n_id_cell",
+            name="nidcell_ii",
             in_sig=[(numpy.int32, (1,)),(numpy.int32, (1,))],
             out_sig=[(numpy.int32, (1,))])
 
@@ -30,4 +30,3 @@ class n_id_cell(gr.sync_block):
         out[0] = in0 +3* in1
         print(out[0])
         return len(output_items[0])
-
