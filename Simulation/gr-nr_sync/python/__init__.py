@@ -35,10 +35,16 @@ except ImportError:
 from .generate_rgrid_c import generate_rgrid_c
 
 
-from .decode_sss_ci import decode_sss_ci
+
 from .unmap_ssb_cc import unmap_ssb_cc
 from .pbch_descramble_ci import pbch_descramble_ci
 from .ssb_detector_cc import ssb_detector_cc
+from .pss_detector import pss_detector
+from .sss_decode import sss_decode
+from .n_id_cell import n_id_cell
+from .pss_detector import pss_detector
+from .sss_decode import sss_decode
+
 
 
 

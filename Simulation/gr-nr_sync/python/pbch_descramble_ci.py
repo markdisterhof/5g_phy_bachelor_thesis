@@ -28,14 +28,12 @@ class pbch_descramble_ci(gr.sync_block):
     """
     docstring for block pbch_descramble_ci
     """
-    def __init__(self, L__max, N_ID_Cell, i_SSB):
+    def __init__(self, L__max):
         gr.sync_block.__init__(self,
             name="pbch_descramble_ci",
-            in_sig=[(numpy.complex64,432)],
+            in_sig=[(numpy.complex64,432),(numpy.int32),(numpy.int32)],
             out_sig=[(numpy.int32,864)])
         self.L__max = L__max
-        self.N_ID_Cell = N_ID_Cell
-        self.i_SSB = i_SSB
 
 
     def work(self, input_items, output_items):
@@ -43,10 +41,10 @@ class pbch_descramble_ci(gr.sync_block):
         out = output_items[0]
         # <+signal processing here+>
         out[:] = nrSyncDecoder.decode_pbch(
-            in0,
+            in0[0],
             self.L__max,
-            self.N_ID_Cell,
-            self.i_SSB
+            in0[1],
+            in0[2]
         )
         return len(output_items[0])
 

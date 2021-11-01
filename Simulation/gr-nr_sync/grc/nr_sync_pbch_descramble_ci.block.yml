@@ -4,7 +4,7 @@ category: '[nr_sync]'
 
 templates:
   imports: import nr_sync
-  make: nr_sync.pbch_descramble_ci(${L__max}, ${N_ID_Cell}, ${i_SSB})
+  make: nr_sync.pbch_descramble_ci(${L__max})
 
 #  Make one 'parameters' list entry for every parameter you want settable from the GUI.
 #     Keys include:
@@ -15,12 +15,7 @@ parameters:
 - id: L__max
   label: L__max
   dtype: int
-- id: N_ID_Cell
-  label: N_ID_Cell
-  dtype: int
-- id: i_SSB
-  label: i_SSB
-  dtype: int
+
 
 #  Make one 'inputs' list entry per input and one 'outputs' list entry per output.
 #  Keys include:
@@ -30,9 +25,15 @@ parameters:
 #      * vlen (optional - data stream vector length. Default is 1)
 #      * optional (optional - set to 1 for optional inputs. Default is 0)
 inputs:
+- id: N_ID_Cell
+  label: N_ID_Cell
+  dtype: int
 - label: scrambled_pbch_symbols
   dtype: complex
   vlen: 432
+- id: i_SSB
+  label: i_SSB
+  dtype: int
 
 outputs:
 - label: pbch_bits

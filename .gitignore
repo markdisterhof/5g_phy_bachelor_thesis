@@ -135,3 +135,7 @@ Recherchen/*
 .vscode/launch.json
 Simulation/nr_sync_simulation.py
 Simulation/gr-nr_sync/build
+.vscode/settings.json
+
+*make*
+*Make*

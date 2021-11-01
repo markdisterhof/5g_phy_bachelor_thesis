@@ -1,20 +1,30 @@
-id: nr_sync_unmap_ssb_cc
-label: unmap_ssb_cc
+id: nr_sync_pss_detector
+label: pss_detector
 category: '[nr_sync]'
 
 templates:
   imports: import nr_sync
-  make: nr_sync.unmap_ssb_cc(${nu})
+  make: nr_sync.pss_detector(${N_RB}, ${L__max}, ${threshold})
 
 #  Make one 'parameters' list entry for every parameter you want settable from the GUI.
 #     Keys include:
-#     * id (makes the value accessible as \$keyname, e.g. in the make entry)
+#     * id (makes the value accessible as keyname, e.g. in the make entry)
 #     * label (label shown in the GUI)
 #     * dtype (e.g. int, float, complex, byte, short, xxx_vector, ...)
+#     * default
 parameters:
-- id: nu
-  label: nu
+- id: N_RB
+  label: N_RB
   dtype: int
+
+- id: L__max
+  label: L__max
+  dtype: int
+
+- id: threshold
+  label: threshold
+  dtype: float
+
 #  Make one 'inputs' list entry per input and one 'outputs' list entry per output.
 #  Keys include:
 #      * label (an identifier for the GUI)
@@ -23,25 +33,19 @@ parameters:
 #      * vlen (optional - data stream vector length. Default is 1)
 #      * optional (optional - set to 1 for optional inputs. Default is 0)
 inputs:
-- label: ssb_symbols
+- label: In
   dtype: complex
-  vlen: 960 # 240 *4
+  vlen: ${ 12 * N_RB }
+
+outputs:
+- label: N_ID2
+  dtype: int
+- label: SSB
+  dtype: complex
+  vlen: 960
 - label: i_ssb
   dtype: int
 
-outputs:
-- label: sss_symbols
-  dtype: complex
-  vlen: 127
-- label: pbch_symbols
-  dtype: complex
-  vlen: 432
-- label: i_ssb
-  dtype: int
-- label: dmrs_symbols
-  dtype: complex
-  vlen: 144
-  
 #  'file_format' specifies the version of the GRC yml format used in the file
 #  and should usually not be changed.
 file_format: 1

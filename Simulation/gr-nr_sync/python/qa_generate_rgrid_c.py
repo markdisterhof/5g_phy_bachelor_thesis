@@ -23,6 +23,7 @@ from gnuradio import gr, gr_unittest
 from gnuradio import blocks
 from generate_rgrid_c import generate_rgrid_c
 import numpy as np
+from nr_phy_sync import nrSSB
 
 class qa_generate_rgrid_c(gr_unittest.TestCase):
 
@@ -33,17 +34,17 @@ class qa_generate_rgrid_c(gr_unittest.TestCase):
         self.tb = None
 
     def test_001_t(self):
+        test_data = nrSSB.get_sync_resource_grid(20,0,1,0,1,0,True,False)
         # set up fg
-        src = generate_rgrid_c(N_RB=20,N_ID1=0,N_ID2=1,k_ssb=0,mu=1,f=0,pbch_data=None,shared_spectr=True,paired_spectr=False)
-        dst = blocks.vector_sink_c(vlen=len(src.resource_grid))
+        src = generate_rgrid_c(N_RB=20,N_ID1=0,N_ID2=1,k_ssb=0,mu=1,f=0,pbch_data=[0],shared_spectr=True,paired_spectr=False)
+        head = blocks.head(nitems= len(test_data.T), sizeof_stream_item= 20*12*8)
+        dst = blocks.vector_sink_c(vlen=20*12)
         #
-        self.tb.connect(src,dst)
+        self.tb.connect(src,head,dst)
         self.tb.run()
         # check data
-        a = dst.data()
-        print(a)
-        b = np.load('syncrgrid_20_0_1_0_1_0_T_F.npy').flatten(order='F')
-        np.testing.assert_array_almost_equal(a,b)
+        np.save('test_data', dst.data())
+        np.testing.assert_array_almost_equal(dst.data(),test_data)
 
 if __name__ == '__main__':
     gr_unittest.run(qa_generate_rgrid_c)

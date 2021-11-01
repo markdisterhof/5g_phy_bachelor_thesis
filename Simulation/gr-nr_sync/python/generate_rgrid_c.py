@@ -36,6 +36,7 @@ class generate_rgrid_c(gr.sync_block):
             name="GenRGRid_c",
             in_sig=None,
             out_sig=[(np.complex64, N_RB*12)])
+        self.set_output_multiple(self.resource_grid.size//(N_RB*12))
 
 
     def work(self, input_items, output_items):
