@@ -1,5 +1,5 @@
 id: nr_sync_rgrid_c
-label: rgrid_c
+label: Sync Resourcegrid
 category: '[nr_sync]'
 
 templates:
@@ -50,7 +50,7 @@ parameters:
 #      * optional (optional - set to 1 for optional inputs. Default is 0)
 
 outputs:
-- label: Out
+- label: out
   dtype: complex
   vlen: ${ 12 * N_RB }
 

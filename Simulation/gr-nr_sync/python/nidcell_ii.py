@@ -28,5 +28,4 @@ class nidcell_ii(gr.sync_block):
         # <+signal processing here+>
         #3 * N_ID1 + N_ID2
         out[0] = in0 +3* in1
-        print(out[0])
         return len(output_items[0])

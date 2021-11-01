@@ -1,5 +1,5 @@
 id: nr_sync_sss_decode_ci
-label: sss_decode_ci
+label: Decode SSS
 category: '[nr_sync]'
 
 templates:
@@ -13,17 +13,15 @@ templates:
 #     * dtype (e.g. int, float, complex, byte, short, xxx_vector, ...)
 #     * default
 inputs:
-- id: N_ID2
-  label: N_ID2
+- label: nid_2
   dtype: int
 
-- id: sss_data
-  label: sss_data
+- label: sss
   dtype: complex
   vlen: 127
 
 outputs:
-- label: n_id1
+- label: nid_1
   dtype: int
   vlen: 1
 

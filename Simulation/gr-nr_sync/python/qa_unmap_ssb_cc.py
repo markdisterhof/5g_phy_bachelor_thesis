@@ -7,8 +7,10 @@
 #
 
 from gnuradio import gr, gr_unittest
-# from gnuradio import blocks
+from gnuradio import blocks
 from unmap_ssb_cc import unmap_ssb_cc
+import numpy
+from nr_phy_sync import nrSSB
 
 class qa_unmap_ssb_cc(gr_unittest.TestCase):
 
@@ -20,7 +22,7 @@ class qa_unmap_ssb_cc(gr_unittest.TestCase):
 
     def test_instance(self):
         # FIXME: Test will fail until you pass sensible arguments to the constructor
-        instance = unmap_ssb_cc()
+        instance = unmap_ssb_cc(1)
 
     def test_001_descriptive_test_name(self):
         ssb_dim = {
@@ -28,11 +30,11 @@ class qa_unmap_ssb_cc(gr_unittest.TestCase):
             'k': 240,
             'nu':3
         }
-        pss_data = np.ones(127, dtype=complex)
-        sss_data = np.ones(127, dtype=complex)*2
-        pbch_data = np.ones(432, dtype=complex)*3
-        dmrs_data = np.ones(144, dtype=complex)*4
-        ssb = np.zeros((240, 4), dtype=complex) + \
+        pss_data = numpy.ones(127)
+        sss_data = numpy.ones(127)*2
+        pbch_data = numpy.ones(432)*3
+        dmrs_data = numpy.ones(144)*4
+        ssb = numpy.zeros((240, 4), dtype=complex) + \
             nrSSB.map_pss(pss_data, ssb_dim) + \
             nrSSB.map_sss(sss_data, ssb_dim) +\
             nrSSB.map_pbch(pbch_data, dmrs_data, ssb_dim)
@@ -54,10 +56,11 @@ class qa_unmap_ssb_cc(gr_unittest.TestCase):
         self.tb.connect((inst,3),snk3)
         self.tb.run()
         # check data
-        self.assertComplexAlmostEqual(nrSSB.unmap_sss(ssb), snk0.data())
-        self.assertComplexAlmostEqual(nrSSB.unmap_pbch(ssb)[0], snk1.data())
-        self.assertComplexAlmostEqual(nrSSB.unmap_pbch(ssb)[1], snk3.data())
-        self.assertEqual(0, snk2.data())
+        
+        numpy.testing.assert_equal(nrSSB.unmap_sss(ssb), snk0.data())
+        numpy.testing.assert_equal(nrSSB.unmap_pbch(ssb,ssb_dim)[0], snk1.data())
+        numpy.testing.assert_equal(nrSSB.unmap_pbch(ssb,ssb_dim)[1], snk3.data())
+        numpy.testing.assert_equal([0], snk2.data())
 
 
 if __name__ == '__main__':

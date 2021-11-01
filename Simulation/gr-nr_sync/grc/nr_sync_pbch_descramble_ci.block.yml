@@ -1,5 +1,5 @@
 id: nr_sync_pbch_descramble_ci
-label: pbch_descramble_ci
+label: Descramble PBCH 
 category: '[nr_sync]'
 
 templates:
@@ -26,14 +26,12 @@ parameters:
 #      * vlen (optional - data stream vector length. Default is 1)
 #      * optional (optional - set to 1 for optional inputs. Default is 0)
 inputs:
-- id: N_ID_Cell
-  label: N_ID_Cell
+- label: nid_cell
   dtype: int
-- label: scrambled_pbch_symbols
+- label: pbch
   dtype: complex
   vlen: 432
-- id: i_SSB
-  label: i_SSB
+- label: i_SSB
   dtype: int
 
 outputs:

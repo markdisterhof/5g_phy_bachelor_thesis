@@ -1,5 +1,5 @@
 id: nr_sync_unmap_ssb_cc
-label: unmap_ssb_cc
+label: Unmap SSB
 category: '[nr_sync]'
 
 templates:
@@ -24,22 +24,22 @@ parameters:
 #      * vlen (optional - data stream vector length. Default is 1)
 #      * optional (optional - set to 1 for optional inputs. Default is 0)
 inputs:
-- label: ssb_symbols
+- label: ssb
   dtype: complex
   vlen: 960 # 240 *4
 - label: i_ssb
   dtype: int
 
 outputs:
-- label: sss_symbols
+- label: sss
   dtype: complex
   vlen: 127
-- label: pbch_symbols
+- label: pbch
   dtype: complex
   vlen: 432
 - label: i_ssb
   dtype: int
-- label: dmrs_symbols
+- label: dmrs
   dtype: complex
   vlen: 144
 

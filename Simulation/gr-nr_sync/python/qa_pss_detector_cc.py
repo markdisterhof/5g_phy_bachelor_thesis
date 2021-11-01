@@ -9,6 +9,7 @@
 from gnuradio import gr, gr_unittest
 # from gnuradio import blocks
 from pss_detector_cc import pss_detector_cc
+import numpy
 
 class qa_pss_detector_cc(gr_unittest.TestCase):
 
@@ -32,9 +33,9 @@ class qa_pss_detector_cc(gr_unittest.TestCase):
             'k' : 240,
             'nu': 2
         }
-        pbch_data = np.random.randint(2, size=864)
+        pbch_data = numpy.random.randint(2, size=864)
         ssb = nrSSB.ssb(ssb_dim, nid1, nid2, lmax, 0, pbch_data)
-        src_data = nrSSB.map_ssb(np.zeros((nrb*12,6),dtype=np.complex64), ssb, kssb, 1).flatten(order='F')
+        src_data = nrSSB.map_ssb(numpy.zeros((nrb*12,6),dtype=numpy.complex64), ssb, kssb, 1).flatten(order='F')
         # set up fg
         flat_src = blocks.vector_source_c(src_data, False)
         src = blocks.stream_to_vector(8, nrb*12)

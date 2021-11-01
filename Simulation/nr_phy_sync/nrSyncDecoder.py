@@ -46,10 +46,10 @@ def pss_correlate(ofdm_sym):
     output (NID_2, k_ssb, max_correlation)
     '''
     ofdm_sym = ofdm_sym.flatten()
-    corr = np.array([np.abs(np.correlate(ofdm_sym, nrSyncSignals.pss(nid2)))
+    corr = np.array([np.correlate(np.real(ofdm_sym), nrSyncSignals.pss(nid2))
                     for nid2 in range(3)], dtype=float)
     (nid2, pss_start) = np.unravel_index(np.argmax(corr), corr.shape)
-    return (nid2, pss_start-56, corr[nid2, pss_start])
+    return nid2, pss_start-56, corr[nid2, pss_start]/127.
 
 
 def pss_coarse_time_frequency_corr(fft_size: int, received_data: Union[np.ndarray, list], threshold: float, threshold_filter_down_spampling_factor: int, ret_mat: False):

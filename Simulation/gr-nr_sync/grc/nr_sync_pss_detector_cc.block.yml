@@ -1,5 +1,5 @@
 id: nr_sync_pss_detector_cc
-label: pss_detector_cc
+label: Decode PSS
 category: '[nr_sync]'
 
 templates:
@@ -33,14 +33,14 @@ parameters:
 #      * vlen (optional - data stream vector length. Default is 1)
 #      * optional (optional - set to 1 for optional inputs. Default is 0)
 inputs:
-- label: In
+- label: in
   dtype: complex
   vlen: ${ 12 * N_RB }
 
 outputs:
-- label: N_ID2
+- label: nid_2
   dtype: int
-- label: SSB
+- label: ssb
   dtype: complex
   vlen: 960
 - label: i_ssb

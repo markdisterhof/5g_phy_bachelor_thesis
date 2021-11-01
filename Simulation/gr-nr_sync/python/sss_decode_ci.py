@@ -9,6 +9,7 @@
 
 import numpy
 from gnuradio import gr
+from nr_phy_sync import nrSyncDecoder
 
 
 class sss_decode_ci(gr.sync_block):
@@ -26,10 +27,11 @@ class sss_decode_ci(gr.sync_block):
     def work(self, input_items, output_items):
         in0 = input_items[0]
         in1 = input_items[1]
-        out = output_items[0]
-
+        out0 = output_items[0]
+        
         for i in range(len(in0)):
             # <+signal processing here+>
-            out[i] = int(nrSyncDecoder.decode_sss(
+            out0[i] = int(nrSyncDecoder.decode_sss(
                 numpy.array(in1[i], dtype=complex), in0[i][0]))
-        return len(out)
+            #print('detected nid1: ', out0[i], print(in1[i]))
+        return len(out0)

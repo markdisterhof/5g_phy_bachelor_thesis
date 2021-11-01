@@ -9,6 +9,7 @@
 from gnuradio import gr, gr_unittest
 # from gnuradio import blocks
 from sss_decode_ci import sss_decode_ci
+import numpy
 
 class qa_sss_decode_ci(gr_unittest.TestCase):
 

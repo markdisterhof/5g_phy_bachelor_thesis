@@ -9,7 +9,7 @@
 
 import numpy
 from gnuradio import gr
-
+from nr_phy_sync import nrSSB
 
 class unmap_ssb_cc(gr.sync_block):
     """
@@ -29,23 +29,29 @@ class unmap_ssb_cc(gr.sync_block):
         self.nu = nu
 
     def work(self, input_items, output_items):
+        in0 = input_items[0]        
+        in1 = input_items[1]
+        out0 = output_items[0]
+        out1 = output_items[1]
+        out2 = output_items[2]
+        out3 = output_items[3]
+
         ssb_dim = {
             'l': 4,
             'k': 240,
             'nu': self.nu
         }
-
-        in0 = input_items
-
-        ssb = numpy.array(in0[0][0], dtype=complex).reshape(
-            (240, 4), order='F')
-
-        out = output_items
-        # <+signal processing here+>
-        sss_data = nrSSB.unmap_sss(ssb)
-        pbch_data, dmrs_data = nrSSB.unmap_pbch(ssb, ssb_dim)
-        out[0][0] = sss_data
-        out[1][0] = pbch_data
-        out[2][0] = in0[1][0]
-        out[3][0] = dmrs_data
-        return 1
+        
+        for i in range(len(in0)):
+            ssb = numpy.array(in0[i], dtype=complex).reshape(
+                (240, 4), order='F')
+            
+            numpy.save('/home/mark/ssb.npy',ssb)
+            # <+signal processing here+>
+            sss_data = nrSSB.unmap_sss(ssb)
+            pbch_data, dmrs_data = nrSSB.unmap_pbch(ssb, ssb_dim)
+            out0[i] = sss_data
+            out1[i] = pbch_data
+            out2[i] = in1[i]
+            out3[i] = dmrs_data
+        return len(out0)

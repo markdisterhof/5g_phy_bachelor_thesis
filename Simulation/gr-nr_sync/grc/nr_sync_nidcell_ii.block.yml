@@ -1,5 +1,5 @@
 id: nr_sync_nidcell_ii
-label: nidcell_ii
+label: N ID Cell
 category: '[nr_sync]'
 
 templates:
@@ -12,7 +12,7 @@ templates:
 #     * label (label shown in the GUI)
 #     * dtype (e.g. int, float, complex, byte, short, xxx_vector, ...)
 #     * default
-parameters:
+#parameters:
 
 #  Make one 'inputs' list entry per input and one 'outputs' list entry per output.
 #  Keys include:
@@ -22,16 +22,16 @@ parameters:
 #      * vlen (optional - data stream vector length. Default is 1)
 #      * optional (optional - set to 1 for optional inputs. Default is 0)
 inputs:
-- label: N_ID2
+- label: nid_2
   dtype: int
   vlen: 1
-- label: N_ID1
+- label: nid_1
   dtype: int
   vlen: 1
 
 
 outputs:
-- label: N_ID_Cell
+- label: nid_cell
   dtype: int
   vlen: 1
 
