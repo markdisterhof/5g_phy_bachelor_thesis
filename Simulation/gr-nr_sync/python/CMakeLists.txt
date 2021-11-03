@@ -22,12 +22,12 @@ add_subdirectory(bindings)
 GR_PYTHON_INSTALL(
     FILES
     __init__.py
-    rgrid_c.py
     nidcell_ii.py
     pbch_descramble_ci.py
     pss_detector_cc.py
     sss_decode_ci.py
-    unmap_ssb_cc.py DESTINATION ${GR_PYTHON_DIR}/nr_sync
+    unmap_ssb_cc.py
+    rgrid_c.py DESTINATION ${GR_PYTHON_DIR}/nr_sync
 )
 
 ########################################################################
@@ -36,9 +36,9 @@ GR_PYTHON_INSTALL(
 include(GrTest)
 
 set(GR_TEST_TARGET_DEPS gnuradio-nr_sync)
-GR_ADD_TEST(qa_rgrid_c ${PYTHON_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/qa_rgrid_c.py)
 GR_ADD_TEST(qa_nidcell_ii ${PYTHON_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/qa_nidcell_ii.py)
 GR_ADD_TEST(qa_pbch_descramble_ci ${PYTHON_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/qa_pbch_descramble_ci.py)
 GR_ADD_TEST(qa_pss_detector_cc ${PYTHON_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/qa_pss_detector_cc.py)
 GR_ADD_TEST(qa_sss_decode_ci ${PYTHON_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/qa_sss_decode_ci.py)
 GR_ADD_TEST(qa_unmap_ssb_cc ${PYTHON_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/qa_unmap_ssb_cc.py)
+GR_ADD_TEST(qa_rgrid_c ${PYTHON_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/qa_rgrid_c.py)

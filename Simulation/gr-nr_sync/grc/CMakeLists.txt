@@ -6,10 +6,10 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 #
 install(FILES
-    nr_sync_rgrid_c.block.yml
     nr_sync_nidcell_ii.block.yml
     nr_sync_pbch_descramble_ci.block.yml
     nr_sync_pss_detector_cc.block.yml
     nr_sync_sss_decode_ci.block.yml
-    nr_sync_unmap_ssb_cc.block.yml DESTINATION share/gnuradio/grc/blocks
+    nr_sync_unmap_ssb_cc.block.yml
+    nr_sync_rgrid_c.block.yml DESTINATION share/gnuradio/grc/blocks
 )
