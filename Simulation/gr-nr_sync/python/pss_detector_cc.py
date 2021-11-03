@@ -9,19 +9,19 @@
 
 import numpy
 from gnuradio import gr
-from nr_phy_sync import nrSyncDecoder
+from nr_phy_sync import nrSyncDecoder,nrSSB
 
 class pss_detector_cc(gr.basic_block):
     """
     docstring for block pss_detector_cc
     """
-    def __init__(self, N_RB, L__max, threshold):
+    def __init__(self, n_carr, L__max, threshold):
         gr.basic_block.__init__(self,
             name="pss_detector_cc",
-                            in_sig=[(numpy.complex64, N_RB*12)],
+                            in_sig=[(numpy.complex64, n_carr)],
                                 # nid2, ssb, i_ssb
                                 out_sig=[(numpy.int32, (1,)), (numpy.complex64, 240*4), (numpy.int32, (1,))])
-        self.N_RB = N_RB
+
         self.L__max = L__max
         self.threshold = threshold
 
@@ -31,6 +31,8 @@ class pss_detector_cc(gr.basic_block):
         self.memory = numpy.zeros((240,4),dtype=numpy.complex64)
         self.memory_idx = -1# ssb consists of 4 ofdm syms in time, memorize idx of 
         self.last_sample= -1
+        self.no_ssb_counter = 0
+        self.reset = 100
 
     def forecast(self, noutput_items, ninputs):
         ninput_items_required = [0]*ninputs
@@ -57,7 +59,6 @@ class pss_detector_cc(gr.basic_block):
                 self.memory_idx = 3
                 self.i_ssb += 1
                 self.i_ssb %= self.L__max
-                
                 self.nid2 = NID_2
                 
                 self.k_ssb = k_ssb
@@ -77,7 +78,14 @@ class pss_detector_cc(gr.basic_block):
                     output_items[1][n_items_produced][:] = self.memory.flatten(order='F')
                     n_items_produced += 1
                 #return 1
-            
+                self.no_ssb_counter = 0
+            else:
+                self.no_ssb_counter +=1
+                if self.no_ssb_counter >= self.reset:
+                    #print(self.no_ssb_counter, self.reset, self.i_ssb)
+                    #self.i_ssb = 0
+                    self.no_ssb_counter = 0
+
         self.consume_each(len(samples))
         #consume(0, len(input_items[0]))
         return n_items_produced

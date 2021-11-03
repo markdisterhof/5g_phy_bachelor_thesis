@@ -4,7 +4,7 @@ category: '[nr_sync]'
 
 templates:
   imports: import nr_sync
-  make: nr_sync.pss_detector_cc(${N_RB}, ${L__max}, ${threshold})
+  make: nr_sync.pss_detector_cc(${n_carr}, ${L__max}, ${threshold})
 
 #  Make one 'parameters' list entry for every parameter you want settable from the GUI.
 #     Keys include:
@@ -13,8 +13,8 @@ templates:
 #     * dtype (e.g. int, float, complex, byte, short, xxx_vector, ...)
 #     * default
 parameters:
-- id: N_RB
-  label: N_RB
+- id: n_carr
+  label: n_carr
   dtype: int
 
 - id: L__max
@@ -35,7 +35,7 @@ parameters:
 inputs:
 - label: in
   dtype: complex
-  vlen: ${ 12 * N_RB }
+  vlen: ${n_carr}
 
 outputs:
 - label: nid_2
