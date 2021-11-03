@@ -129,4 +129,4 @@ def decode_pbch(pbch_data: np.ndarray, L__max: int, N_ID_Cell: int, i_SSB: int):
     c = nrSyncSignals.prsg((1+v) * M_bit, N_ID_Cell)
     scr = [c[i + v * M_bit] for i in range(M_bit)]
 
-    return np.logical_xor(b, scr)
+    return np.array([int(x) for x in np.logical_xor(b, scr)])
