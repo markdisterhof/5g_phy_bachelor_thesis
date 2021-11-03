@@ -27,5 +27,6 @@ class nidcell_ii(gr.sync_block):
         out = output_items[0]
         # <+signal processing here+>
         #3 * N_ID1 + N_ID2
+        print('Detected SSB: NID1:{}, NID2:{}, NIDCELL:{}'.format(in1[0],in0[0],in0+3* in1))
         out[0] = in0 +3* in1
         return len(output_items[0])
