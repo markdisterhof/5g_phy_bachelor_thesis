@@ -73,17 +73,16 @@ def map_pbch(data_pbch, data_dmrs, ssb_dim, beta_pbch=1., beta_dmrs=1.):
             "pbch is always 432 symbols, dmrs is always 144 symbols")
     i_dmrs, i_pbch = 0, 0
 
-    data_pbch = np.array(data_pbch) * beta_pbch
-    data_dmrs = np.array(data_dmrs) * beta_dmrs
-
+    data_pbch = np.array(data_pbch,dtype=complex) * beta_pbch
+    data_dmrs = np.array(data_dmrs,dtype=complex) * beta_dmrs
     mask = np.zeros((ssb_dim['k'], ssb_dim['l']), dtype=complex)
-    if not any(np.iscomplex(np.concatenate((data_pbch, data_dmrs)))):
-        mask = np.zeros((ssb_dim['k'], ssb_dim['l']), dtype=int)
+
     for l in range(1, 4):
         k_range = range(240)
         if l == 2:
             k_range = np.concatenate((range(48), range(192, 240)))
         for k in k_range:
+            
             if k % 4 == ssb_dim['nu']:
                 mask[k, l] = data_dmrs[i_dmrs]
                 i_dmrs += 1
@@ -157,7 +156,6 @@ def unmap_pss(received_data: np.ndarray, ssb_dim: dict = None):
     ssb_mask = np.zeros((ssb_dim['k'], ssb_dim['l']), dtype=int)
     ssb_mask += map_pss(np.ones(127), ssb_dim)
     mask_rgrid = np.zeros(received_data.shape)
-    print(mask_rgrid.shape, ssb_mask.shape, ssb_dim)
     mask_rgrid[ssb_dim['k_offset']:ssb_dim['k_offset']+240,
                ssb_dim['l_offset']:ssb_dim['l_offset']+4] = ssb_mask
     return received_data[
@@ -188,7 +186,6 @@ def unmap_sss(received_data: np.ndarray, ssb_dim: dict = None):
     mask_rgrid = np.zeros(received_data.shape, dtype=complex)
     mask_rgrid[ssb_dim['k_offset']:ssb_dim['k_offset']+240,
                ssb_dim['l_offset']:ssb_dim['l_offset']+4] = ssb_mask
-
     return np.ma.masked_array(
         received_data.flatten(order='F'),
         np.logical_not(
@@ -215,14 +212,14 @@ def unmap_pbch(received_data: np.ndarray, ssb_dim: dict = None):
     ssb_dim['k_offset'] = ssb_dim.get('k_offset', 0)
     ssb_dim['l_offset'] = ssb_dim.get('l_offset', 0)
 
-    ssb_mask_pbch = np.zeros((ssb_dim['k'], ssb_dim['l']), dtype=int)
-    ssb_mask_dmrs = np.zeros((ssb_dim['k'], ssb_dim['l']), dtype=int)
+    ssb_mask_pbch = np.zeros((ssb_dim['k'], ssb_dim['l']), dtype=complex)
+    ssb_mask_dmrs = np.zeros((ssb_dim['k'], ssb_dim['l']), dtype=complex)
 
     ssb_mask_pbch += map_pbch(np.ones(432), np.zeros(144), ssb_dim)
     ssb_mask_dmrs += map_pbch(np.zeros(432), np.ones(144), ssb_dim)
 
-    mask_rgrid_pbch = np.zeros(received_data.shape)
-    mask_rgrid_dmrs = np.zeros(received_data.shape)
+    mask_rgrid_pbch = np.zeros(received_data.shape, dtype=complex)
+    mask_rgrid_dmrs = np.zeros(received_data.shape, dtype=complex)
 
     mask_rgrid_pbch[ssb_dim['k_offset']:ssb_dim['k_offset']+240,
                     ssb_dim['l_offset']:ssb_dim['l_offset']+4] = ssb_mask_pbch
@@ -266,8 +263,23 @@ def map_ssb(res_grid, ssb, k_offs, l_offs):
     return res_grid
 
 
-def get_sync_resource_grid(N_RB, N_ID1, N_ID2, k_ssb, mu, f, shared_spectr, paired_spectr):
-    return get_sync_resource_grid_pbch(N_RB, N_ID1, N_ID2, k_ssb, mu, f, np.random.randint(2, size=864), shared_spectr, paired_spectr)
+def grid(n_carr=240, N_ID1=0, N_ID2=0, k_ssb=0, mu=0, f=0, shared_spectr=False, paired_spectr=False, pbch= np.random.randint(2, size=864)):
+    if n_carr < 240 + k_ssb:
+        raise ValueError('Provided n_carr is too small. n_carr: {0}, needed: {1}'.format(n_carr,240+k_ssb))
+    
+
+
+    #find N_RB 
+    N_RB = int(n_carr//12)
+
+    #gen rgrid for sync
+    grid = get_sync_resource_grid_pbch(N_RB, N_ID1, N_ID2, k_ssb, mu, f, pbch, shared_spectr, paired_spectr)
+
+    #fit grid with N_RB*12 carr into n_carr
+    mask= np.zeros((n_carr,len(grid[0])), dtype=complex)
+    mask[:len(grid),:len(grid[0])]= grid
+
+    return mask
 
 
 def get_sync_resource_grid_pbch(N_RB, N_ID1, N_ID2, k_ssb, mu, f, pbch_data, shared_spectr, paired_spectr):
@@ -296,12 +308,16 @@ def get_sync_resource_grid_pbch(N_RB, N_ID1, N_ID2, k_ssb, mu, f, pbch_data, sha
     N_SC, N_SYMB = get_rgrid_dimensions(mu, N_RB)
 
     can_idxs = get_ssb_candidate_idx(mu, f, shared_spectr, paired_spectr)
-    L__max = len(can_idxs)
     idxs = get_ssb_idxs(can_idxs, mu, shared_spectr)
+    L__max = len(idxs)
     res_grid = np.zeros(shape=(N_SC, N_SYMB), dtype=complex)
 
-    for idx in idxs:
-        ssb_i = ssb(ssb_dim, N_ID1, N_ID2, L__max, idx, pbch_data)
+    pbch_data = np.array(pbch_data)
+    pbch_data.resize(L__max*864)
+    pbch_data_arr = pbch_data.reshape(L__max,864)
+    
+    for i_ssb,idx in enumerate(idxs):
+        ssb_i = ssb(ssb_dim, N_ID1, N_ID2, L__max, i_ssb, pbch_data_arr[i_ssb])
         res_grid = map_ssb(res_grid, ssb_i, k_ssb, idx)
     return res_grid
 
