@@ -87,14 +87,15 @@ class nr_sync_dem(gr.top_block, Qt.QWidget):
         self.mu = mu = 0
         self.f = f = 100000
         self.num_carr = num_carr = 2**8
-        self.idxs = idxs = nr_phy_sync.nrSSB.get_ssb_idxs(nr_phy_sync.nrSSB.get_ssb_candidate_idx(mu, f, shared_spectr, paired_spectr), mu, shared_spectr)
+        self.idxs = idxs = nr_phy_sync.nrSSB.get_ssb_ids(nr_phy_sync.nrSSB.get_ssb_candidate_idx(mu, f, shared_spectr, paired_spectr), mu, shared_spectr)
+        self.N_ID2 = N_ID2 = 1
+        self.N_ID1 = N_ID1 = 234
         self.threshold = threshold = 0.9
         self.samp_rate = samp_rate = num_carr*5
         self.pbch_data = pbch_data = np.loadtxt('/home/mark/OneDrive/Uni/7.Sem/Bach/Simulation/resource/antbin.txt',dtype=int)
+        self.nu = nu = (N_ID2 + 3* N_ID1)%4
         self.noise = noise = 0.1
         self.k_ssb = k_ssb = 10
-        self.N_ID2 = N_ID2 = 1
-        self.N_ID1 = N_ID1 = 234
         self.L__max = L__max = len(idxs)
 
         ##################################################
@@ -241,7 +242,7 @@ class nr_sync_dem(gr.top_block, Qt.QWidget):
             self.top_grid_layout.setRowStretch(r, 1)
         for c in range(0, 1):
             self.top_grid_layout.setColumnStretch(c, 1)
-        self.nr_sync_unmap_ssb_cc_0 = nr_sync.unmap_ssb_cc((N_ID2 + 3* N_ID1)%4)
+        self.nr_sync_unmap_ssb_cc_0 = nr_sync.unmap_ssb_cc(nu)
         self.nr_sync_sss_decode_ci_0 = nr_sync.sss_decode_ci()
         self.nr_sync_rgrid_c_0 = nr_sync.rgrid_c(num_carr, N_ID1, N_ID2, k_ssb, mu, f, pbch_data, shared_spectr, paired_spectr)
         self.nr_sync_pss_detector_cc_0 = nr_sync.pss_detector_cc(num_carr, L__max, threshold)
@@ -286,8 +287,8 @@ class nr_sync_dem(gr.top_block, Qt.QWidget):
         self.connect((self.nr_sync_pss_detector_cc_0, 1), (self.blocks_vector_to_stream_0_0_0, 0))
         self.connect((self.nr_sync_pss_detector_cc_0, 0), (self.nr_sync_nidcell_ii_0, 0))
         self.connect((self.nr_sync_pss_detector_cc_0, 0), (self.nr_sync_sss_decode_ci_0, 0))
-        self.connect((self.nr_sync_pss_detector_cc_0, 2), (self.nr_sync_unmap_ssb_cc_0, 1))
         self.connect((self.nr_sync_pss_detector_cc_0, 1), (self.nr_sync_unmap_ssb_cc_0, 0))
+        self.connect((self.nr_sync_pss_detector_cc_0, 2), (self.nr_sync_unmap_ssb_cc_0, 1))
         self.connect((self.nr_sync_rgrid_c_0, 0), (self.blocks_stream_to_vector_1, 0))
         self.connect((self.nr_sync_sss_decode_ci_0, 0), (self.nr_sync_nidcell_ii_0, 1))
         self.connect((self.nr_sync_unmap_ssb_cc_0, 3), (self.blocks_null_sink_1, 0))
@@ -309,28 +310,28 @@ class nr_sync_dem(gr.top_block, Qt.QWidget):
 
     def set_shared_spectr(self, shared_spectr):
         self.shared_spectr = shared_spectr
-        self.set_idxs(nr_phy_sync.nrSSB.get_ssb_idxs(nr_phy_sync.nrSSB.get_ssb_candidate_idx(self.mu, self.f, self.shared_spectr, self.paired_spectr), self.mu, self.shared_spectr))
+        self.set_idxs(nr_phy_sync.nrSSB.get_ssb_ids(nr_phy_sync.nrSSB.get_ssb_candidate_idx(self.mu, self.f, self.shared_spectr, self.paired_spectr), self.mu, self.shared_spectr))
 
     def get_paired_spectr(self):
         return self.paired_spectr
 
     def set_paired_spectr(self, paired_spectr):
         self.paired_spectr = paired_spectr
-        self.set_idxs(nr_phy_sync.nrSSB.get_ssb_idxs(nr_phy_sync.nrSSB.get_ssb_candidate_idx(self.mu, self.f, self.shared_spectr, self.paired_spectr), self.mu, self.shared_spectr))
+        self.set_idxs(nr_phy_sync.nrSSB.get_ssb_ids(nr_phy_sync.nrSSB.get_ssb_candidate_idx(self.mu, self.f, self.shared_spectr, self.paired_spectr), self.mu, self.shared_spectr))
 
     def get_mu(self):
         return self.mu
 
     def set_mu(self, mu):
         self.mu = mu
-        self.set_idxs(nr_phy_sync.nrSSB.get_ssb_idxs(nr_phy_sync.nrSSB.get_ssb_candidate_idx(self.mu, self.f, self.shared_spectr, self.paired_spectr), self.mu, self.shared_spectr))
+        self.set_idxs(nr_phy_sync.nrSSB.get_ssb_ids(nr_phy_sync.nrSSB.get_ssb_candidate_idx(self.mu, self.f, self.shared_spectr, self.paired_spectr), self.mu, self.shared_spectr))
 
     def get_f(self):
         return self.f
 
     def set_f(self, f):
         self.f = f
-        self.set_idxs(nr_phy_sync.nrSSB.get_ssb_idxs(nr_phy_sync.nrSSB.get_ssb_candidate_idx(self.mu, self.f, self.shared_spectr, self.paired_spectr), self.mu, self.shared_spectr))
+        self.set_idxs(nr_phy_sync.nrSSB.get_ssb_ids(nr_phy_sync.nrSSB.get_ssb_candidate_idx(self.mu, self.f, self.shared_spectr, self.paired_spectr), self.mu, self.shared_spectr))
 
     def get_num_carr(self):
         return self.num_carr
@@ -347,6 +348,20 @@ class nr_sync_dem(gr.top_block, Qt.QWidget):
     def set_idxs(self, idxs):
         self.idxs = idxs
         self.set_L__max(len(self.idxs))
+
+    def get_N_ID2(self):
+        return self.N_ID2
+
+    def set_N_ID2(self, N_ID2):
+        self.N_ID2 = N_ID2
+        self.set_nu((self.N_ID2 + 3* self.N_ID1)%4)
+
+    def get_N_ID1(self):
+        return self.N_ID1
+
+    def set_N_ID1(self, N_ID1):
+        self.N_ID1 = N_ID1
+        self.set_nu((self.N_ID2 + 3* self.N_ID1)%4)
 
     def get_threshold(self):
         return self.threshold
@@ -366,6 +381,12 @@ class nr_sync_dem(gr.top_block, Qt.QWidget):
     def set_pbch_data(self, pbch_data):
         self.pbch_data = pbch_data
 
+    def get_nu(self):
+        return self.nu
+
+    def set_nu(self, nu):
+        self.nu = nu
+
     def get_noise(self):
         return self.noise
 
@@ -378,18 +399,6 @@ class nr_sync_dem(gr.top_block, Qt.QWidget):
 
     def set_k_ssb(self, k_ssb):
         self.k_ssb = k_ssb
-
-    def get_N_ID2(self):
-        return self.N_ID2
-
-    def set_N_ID2(self, N_ID2):
-        self.N_ID2 = N_ID2
-
-    def get_N_ID1(self):
-        return self.N_ID1
-
-    def set_N_ID1(self, N_ID1):
-        self.N_ID1 = N_ID1
 
     def get_L__max(self):
         return self.L__max

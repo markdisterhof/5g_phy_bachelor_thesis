@@ -84,7 +84,7 @@ blocks:
   id: variable
   parameters:
     comment: ''
-    value: nr_phy_sync.nrSSB.get_ssb_idxs(nr_phy_sync.nrSSB.get_ssb_candidate_idx(mu,
+    value: nr_phy_sync.nrSSB.get_ssb_ids(nr_phy_sync.nrSSB.get_ssb_candidate_idx(mu,
       f, shared_spectr, paired_spectr), mu, shared_spectr)
   states:
     bus_sink: false
@@ -136,6 +136,18 @@ blocks:
     bus_source: false
     bus_structure: null
     coordinate: [288, 380.0]
+    rotation: 0
+    state: true
+- name: nu
+  id: variable
+  parameters:
+    comment: ''
+    value: (N_ID2 + 3* N_ID1)%4
+  states:
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate: [160, 252.0]
     rotation: 0
     state: true
 - name: num_carr
@@ -651,7 +663,7 @@ blocks:
     comment: ''
     maxoutbuf: '0'
     minoutbuf: '0'
-    nu: (N_ID2 + 3* N_ID1)%4
+    nu: nu
   states:
     bus_sink: false
     bus_source: false

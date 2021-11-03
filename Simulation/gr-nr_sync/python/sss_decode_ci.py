@@ -32,6 +32,5 @@ class sss_decode_ci(gr.sync_block):
         for i in range(len(in0)):
             # <+signal processing here+>
             out0[i] = int(nrSyncDecoder.decode_sss(
-                numpy.array(in1[i], dtype=complex), in0[i][0]))
-            #print('detected nid1: ', out0[i], print(in1[i]))
+                numpy.array(in1[i], dtype=complex), in0[0][0]))
         return len(out0)

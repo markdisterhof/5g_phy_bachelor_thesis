@@ -1,64 +1,63 @@
+'''
+Various methods for generation of sync-related data in 5G.
+Copyright 2021 Mark Disterhof.
+'''
 import numpy as np
-import nrSyncSignals as nrss
+import nrSyncSignals
+from typing import Union
 
 
-def map_pss(data, ssb_dim, beta=1.):
-    """Mapping of PSS within an SS/PBCH block as per
-
-    TS 38 211 V16.2.0 (2020-07) 7.4.3.1.1
+def map_pss(data: Union[np.ndarray, list], beta: float = 1.0) -> np.ndarray:
+    """Mapping of PSS within an SS/PBCH block as per TS 38 211 V16.2.0 (2020-07) 7.4.3.1.1
 
     Args:
-        data : PSS data
-        ssb_dim (struct) : SSB dimensions and nu
-        beta (float, optional): PSS power allocation factor. Defaults to 1.0
+        data (Union[np.ndarray, list]): PSS data
+        beta (float, optional): [description]. PSS power allocation factor. Defaults to 1.0
 
     Raises:
-        ValueError: PSS data must be 127 symbols
+        ValueError: ValueError: PSS data must be 127 symbols
 
     Returns:
-        [complex, complex]: SSB with mapped PSS
+        np.ndarray: 2D array, SSB with mapped PSS
     """
+
     if not len(data) == 127:
         raise ValueError("PSS data must be 127 symbols")
-    mask = np.zeros((ssb_dim['k'], ssb_dim['l']), dtype=complex)
+    mask = np.zeros((240, 4), dtype=complex)
     data = np.array(data) * beta
     mask[56:183, 0] = data
     return mask
 
 
-def map_sss(data, ssb_dim, beta=1.):
-    """Mapping of SSS within an SS/PBCH block as per
-
-    TS 38 211 V16.2.0 (2020-07) 7.4.3.1.2
+def map_sss(data: Union[np.ndarray, list], beta: float = 1.0) -> np.ndarray:
+    """Mapping of SSS within an SS/PBCH block as per TS 38 211 V16.2.0 (2020-07) 7.4.3.1.2
 
     Args:
-        data : SSS data
-        ssb_dim (struct) : SSB dimensions and nu
+        data (Union[np.ndarray, list]): SSS data
         beta (float, optional): SSS power allocation factor. Defaults to 1.0
 
     Raises:
         ValueError: SSS data must be 127 symbols
 
     Returns:
-        [complex, complex]: SSB with mapped SSS
+        np.ndarray: 2D array, SSB with mapped SSS
     """
+
     if not len(data) == 127:
         raise ValueError("sss data must be 127 symbols")
-    mask = np.zeros((ssb_dim['k'], ssb_dim['l']), dtype=complex)
+    mask = np.zeros((240, 4), dtype=complex)
     data = np.array(data) * beta
     mask[56:183, 2] = data
     return mask
 
 
-def map_pbch(data_pbch, data_dmrs, ssb_dim, beta_pbch=1., beta_dmrs=1.):
-    """Mapping of PBCH and DM-RS within an SS/PBCH block as per
-
-    TS 38 211 V16.2.0 (2020-07) 7.4.3.1.3
+def map_pbch(data_pbch: Union[np.ndarray, list], data_dmrs: Union[np.ndarray, list], nu: int, beta_pbch: float = 1.0, beta_dmrs: float = 1.0) -> np.ndarray:
+    """Mapping of PBCH and DM-RS within an SS/PBCH block as per TS 38 211 V16.2.0 (2020-07) 7.4.3.1.3
 
     Args:
-        data_pbch ([complex]): PBCH data
-        data_dmrs ([complex]): DM-RS data
-        ssb_dim (struct): SSB dimensions and nu
+        data_pbch (Union[np.ndarray, list]): PBCH data
+        data_dmrs (Union[np.ndarray, list]): DM-RS data
+        nu (int) : nu, as defined: N_ID_CELL % 4
         beta_pbch (float, optional): PBCH power allocation factor. Defaults to 1.0
         beta_dmrs (float, optional): DM-RS power allocation factor. Defaults to 1.0
 
@@ -66,24 +65,23 @@ def map_pbch(data_pbch, data_dmrs, ssb_dim, beta_pbch=1., beta_dmrs=1.):
         ValueError: data_pbch must be 432 symbols, data_dmrs must be 144 symbols
 
     Returns:
-        [complex, complex]: SSB with mapped PBCH and DM-Rs
+        np.ndarray: 2D array, SSB with mapped PBCH and DM-RS
     """
     if not len(data_pbch) == 432 or not len(data_dmrs) == 144:
         raise ValueError(
             "pbch is always 432 symbols, dmrs is always 144 symbols")
     i_dmrs, i_pbch = 0, 0
 
-    data_pbch = np.array(data_pbch,dtype=complex) * beta_pbch
-    data_dmrs = np.array(data_dmrs,dtype=complex) * beta_dmrs
-    mask = np.zeros((ssb_dim['k'], ssb_dim['l']), dtype=complex)
+    data_pbch = np.array(data_pbch, dtype=complex) * beta_pbch
+    data_dmrs = np.array(data_dmrs, dtype=complex) * beta_dmrs
+    mask = np.zeros((240, 4), dtype=complex)
 
     for l in range(1, 4):
         k_range = range(240)
         if l == 2:
             k_range = np.concatenate((range(48), range(192, 240)))
         for k in k_range:
-            
-            if k % 4 == ssb_dim['nu']:
+            if k % 4 == nu:
                 mask[k, l] = data_dmrs[i_dmrs]
                 i_dmrs += 1
             else:
@@ -92,237 +90,248 @@ def map_pbch(data_pbch, data_dmrs, ssb_dim, beta_pbch=1., beta_dmrs=1.):
     return mask
 
 
-def ssb(ssb_dim, N_ID1, N_ID2, L__max, ssb_idx, pbch_data):
+def ssb(N_ID1: int, N_ID2: int, L_max: int, i_ssb: int, pbch_data: Union[np.ndarray, list]) -> np.ndarray:
     """Generate SS/PBCH block 
 
     Args:
-        ssb_dim (struct): SSB dimensions and nu
         N_ID1 (int): Cell ID group
         N_ID2 (int): Cell ID sector
-        L__max (int): Maximum number of candidate SS/PBCH blocks in a half frame
-        ssb_idx (int): Candidate SS/PBCH block index
+        L_max (int): Maximum number of SS/PBCH blocks in a half frame
+        i_ssb (int): Candidate SS/PBCH block index
+        pbch_data (Union[np.ndarray, list]): Binary PBCH data
 
     Returns:
-        [complex,complex]: 
+        np.ndarray: 2D array, SS/PBCH block 
     """
-
     N_ID_Cell = 3 * N_ID1 + N_ID2
+    nu = N_ID_Cell % 4
 
-    ssb = np.zeros((ssb_dim['k'], ssb_dim['l']), dtype=complex)  # one ssb
+    ssb = np.zeros((240, 4), dtype=complex)
 
     # pss mapping
-    data_pss = nrss.pss(N_ID2=N_ID2)
-
-    ssb += map_pss(data_pss, ssb_dim)
+    data_pss = nrSyncSignals.pss(N_ID2=N_ID2)
+    ssb += map_pss(data_pss)
 
     # sss mapping
-    data_sss = nrss.sss(
-        N_ID1=N_ID1,
-        N_ID2=N_ID2)
-
-    ssb += map_sss(data_sss, ssb_dim)
+    data_sss = nrSyncSignals.sss(N_ID1=N_ID1, N_ID2=N_ID2)
+    ssb += map_sss(data_sss)
 
     # pbch and dmrs mapping
-    data_pbch = nrss.pbch(
-        pbch_data,
-        L__max,
-        N_ID_Cell,
-        ssb_idx)
+    pbch = nrSyncSignals.pbch(pbch_data, i_ssb, N_ID_Cell, L_max)
+    dmrs = nrSyncSignals.dmrs(i_ssb, N_ID_Cell, L_max, 0)
+    ssb += map_pbch(pbch, dmrs, nu)
 
-    data_dmrs = nrss.dmrs(ssb_idx, N_ID_Cell, L__max, 0)
-
-    ssb += map_pbch(data_pbch, data_dmrs, ssb_dim)
     return ssb
 
 
-def unmap_pss(received_data: np.ndarray, ssb_dim: dict = None):
-    """Unmap PSS from given resource grid
+def unmap_pss(received_data: np.ndarray) -> np.ndarray:
+    """Unmap PSS from given SSB
 
     Args:
-        received_data ([complex, complex]): 2D resource grid
-        ssb_dim (struct): SSB dimensions and nu 
+        received_data (np.ndarray): SSB with shape (240,4)
+
+    Raises:
+        IndexError: Provided SSB is not (240,4) in shape
 
     Returns:
-        [complex]: PSS data
+        np.ndarray: PSS data
     """
-    if ssb_dim is None:
-        ssb_dim = {
-            'l': 4,
-            'k': 240
-        }
-    ssb_dim['k_offset'] = ssb_dim.get('k_offset', 0)
-    ssb_dim['l_offset'] = ssb_dim.get('l_offset', 0)
 
-    ssb_mask = np.zeros((ssb_dim['k'], ssb_dim['l']), dtype=int)
-    ssb_mask += map_pss(np.ones(127), ssb_dim)
-    mask_rgrid = np.zeros(received_data.shape)
-    mask_rgrid[ssb_dim['k_offset']:ssb_dim['k_offset']+240,
-               ssb_dim['l_offset']:ssb_dim['l_offset']+4] = ssb_mask
-    return received_data[
-        np.nonzero(
-            np.multiply(mask_rgrid, received_data))]
+    if not received_data.shape == (240, 4):
+        raise IndexError(
+            'Provided SSB is not (240,4) in shape: {}'.format(received_data.shape))
 
+    mask = map_pss(np.ones(127))
 
-def unmap_sss(received_data: np.ndarray, ssb_dim: dict = None):
-    """Unmap SSS from given resource grid
-
-    Args:
-        received_data ([complex, complex]): 2D resource grid
-        ssb_dim (struct): SSB dimensions and nu 
-
-    Returns:
-        [complex]: SSS data
-    """
-    if ssb_dim is None:
-        ssb_dim = {
-            'l': 4,
-            'k': 240
-        }
-    ssb_dim['k_offset'] = ssb_dim.get('k_offset', 0)
-    ssb_dim['l_offset'] = ssb_dim.get('l_offset', 0)
-
-    ssb_mask = np.zeros((ssb_dim['k'], ssb_dim['l']), dtype=complex)
-    ssb_mask += map_sss(np.ones(127, dtype=complex), ssb_dim)
-    mask_rgrid = np.zeros(received_data.shape, dtype=complex)
-    mask_rgrid[ssb_dim['k_offset']:ssb_dim['k_offset']+240,
-               ssb_dim['l_offset']:ssb_dim['l_offset']+4] = ssb_mask
     return np.ma.masked_array(
         received_data.flatten(order='F'),
         np.logical_not(
-            mask_rgrid.flatten(order='F')
+            mask.flatten(order='F')
         )
     ).compressed()
 
 
-def unmap_pbch(received_data: np.ndarray, ssb_dim: dict = None):
+def unmap_sss(received_data: np.ndarray) -> np.ndarray:
+    """Unmap SSS from given SSB
+
+    Args:
+        received_data (np.ndarray): SSB with shape (240,4)
+
+    Raises:
+        IndexError: Provided SSB is not (240,4) in shape
+
+    Returns:
+        np.ndarray: PSS data
+    """
+    if not received_data.shape == (240, 4):
+        raise IndexError(
+            'Provided SSB is not (240,4) in shape: {}'.format(received_data.shape))
+
+    mask = map_sss(np.ones(127))
+
+    return np.ma.masked_array(
+        received_data.flatten(order='F'),
+        np.logical_not(
+            mask.flatten(order='F')
+        )
+    ).compressed()
+
+
+def unmap_pbch(received_data: np.ndarray, nu: int) -> (np.ndarray, np.ndarray):
     """Unmap PBCH and DM-RS from given resource grid
 
     Args:
-        received_data ([complex, complex]): 2D resource grid
-        ssb_dim (struct): SSB dimensions and nu 
+        received_data (np.ndarray): SSB with shape (240,4)
+        nu (int): nu, as defined: N_ID_CELL % 4
+
+    Raises:
+        IndexError: Provided SSB is not (240,4) in shape
 
     Returns:
-        tuple: PBCH and DM-RS data
+        (np.ndarray, np.ndarray): PBCH and DM-RS data
     """
-    if ssb_dim is None:
-        ssb_dim = {
-            'l': 4,
-            'k': 240
-        }
-    ssb_dim['k_offset'] = ssb_dim.get('k_offset', 0)
-    ssb_dim['l_offset'] = ssb_dim.get('l_offset', 0)
+    if not received_data.shape == (240, 4):
+        raise IndexError(
+            'Provided SSB is not (240,4) in shape: {}'.format(received_data.shape))
 
-    ssb_mask_pbch = np.zeros((ssb_dim['k'], ssb_dim['l']), dtype=complex)
-    ssb_mask_dmrs = np.zeros((ssb_dim['k'], ssb_dim['l']), dtype=complex)
+    mask_pbch = map_pbch(np.ones(432), np.zeros(144), nu)
+    mask_dmrs = map_pbch(np.zeros(432), np.ones(144), nu)
 
-    ssb_mask_pbch += map_pbch(np.ones(432), np.zeros(144), ssb_dim)
-    ssb_mask_dmrs += map_pbch(np.zeros(432), np.ones(144), ssb_dim)
-
-    mask_rgrid_pbch = np.zeros(received_data.shape, dtype=complex)
-    mask_rgrid_dmrs = np.zeros(received_data.shape, dtype=complex)
-
-    mask_rgrid_pbch[ssb_dim['k_offset']:ssb_dim['k_offset']+240,
-                    ssb_dim['l_offset']:ssb_dim['l_offset']+4] = ssb_mask_pbch
-    mask_rgrid_dmrs[ssb_dim['k_offset']:ssb_dim['k_offset']+240,
-                    ssb_dim['l_offset']:ssb_dim['l_offset']+4] = ssb_mask_dmrs
-
-    # data_pbch = received_data.flatten(order='F')[np.nonzero(
-    #     np.multiply(mask_rgrid_pbch, received_data).flatten(order='F'))]
-    # data_dmrs = received_data.flatten(order='F')[np.nonzero(
-    #     np.multiply(mask_rgrid_dmrs, received_data).flatten(order='F'))]
     data_pbch = np.ma.masked_array(
         received_data.flatten(order='F'),
         np.logical_not(
-            mask_rgrid_pbch.flatten(order='F')
+            mask_pbch.flatten(order='F')
         )
     ).compressed()
 
     data_dmrs = np.ma.masked_array(
         received_data.flatten(order='F'),
         np.logical_not(
-            mask_rgrid_dmrs.flatten(order='F')
+            mask_dmrs.flatten(order='F')
         )
     ).compressed()
 
     return data_pbch, data_dmrs
 
 
-def map_ssb(res_grid, ssb, k_offs, l_offs):
-    """Place SSB in provided resource grid with offsets 
+def unmap_ssb(res_grid: np.ndarray, k_offs: int, l_offs: int) -> np.ndarray:
+    """Recover SSB from provided resource grid with offsets
 
     Args:
-        res_grid ([complex, complex]): 2D resource grid
-        ssb ([complex, complex]): 2D SSB
+        res_grid (np.ndarray): 2D resource grid
+        ssb (np.ndarray): 2D SSB
         k_offs (int): Offset counted in multiples of Subcarriers
-        l_offs (int): Offset counted in slots
+        l_offs (int): Offset counted in symbols
+    Raises:
+        IndexError: Provided res_grid is too small to hold an SSB
 
     Returns:
-        [complex, complex]: 2D resource grid
+        np.ndarray: 2D resource grid with placed SSB
     """
-    res_grid[k_offs:len(ssb)+k_offs, l_offs:len(ssb[0, :])+l_offs] = ssb
+    if res_grid.shape < (240+k_offs, 4+l_offs):
+        raise IndexError(
+            'Provided res_grid is too small to hold an SSB: {}'.format(res_grid.shape))
+
+    return res_grid[k_offs:k_offs+240, l_offs:l_offs+4]
+
+
+def map_ssb(res_grid: np.ndarray, ssb: np.ndarray, k_offs: int, l_offs: int) -> np.ndarray:
+    """Place SSB in provided resource grid with offsets
+
+    Args:
+        res_grid (np.ndarray): 2D resource grid
+        ssb (np.ndarray): 2D SSB
+        k_offs (int): Offset counted in multiples of Subcarriers
+        l_offs (int): Offset counted in symbols
+    Raises:
+        IndexError: Provided res_grid is too small to hold an SSB
+
+    Returns:
+        np.ndarray: 2D resource grid with placed SSB
+    """
+    if res_grid.shape < (240+k_offs, 4+l_offs):
+        raise IndexError(
+            'Provided res_grid is too small to hold an SSB: {}'.format(res_grid.shape))
+
+    res_grid[k_offs:k_offs+240, l_offs:l_offs+4] = ssb
     return res_grid
 
 
-def grid(n_carr=240, N_ID1=0, N_ID2=0, k_ssb=0, mu=0, f=0, shared_spectr=False, paired_spectr=False, pbch= np.random.randint(2, size=864)):
+def grid(n_carr: int = 240, N_ID1: int = 0, N_ID2: int = 0, k_ssb: int = 0, mu: int = 0, f: int = 0, shared_spectr: bool = False, paired_spectr: bool = False, pbch: Union[np.ndarray, list] = np.random.randint(2, size=864)) -> np.ndarray:
+    """Produce a NR sync resource grid. 
+
+    Args:
+        n_carr (int, optional): Number of carriers. Defaults to 240.
+        N_ID1 (int, optional): NID1. Defaults to 0.
+        N_ID2 (int, optional): NID2. Defaults to 0.
+        k_ssb (int, optional): Carrier offset from OffsetToPointA to SSB. Defaults to 0.
+        mu (int, optional): Numerology index. Defaults to 0.
+        f (int, optional): Operating frequency. Defaults to 0.
+        shared_spectr (bool, optional): Shared spectrum use. Defaults to False.
+        paired_spectr (bool, optional): Paired spectrum use. Defaults to False.
+        pbch (Union[np.ndarray, list], optional): PBCH Payload bits. Defaults to np.random.randint(2, size=864).
+
+    Raises:
+        ValueError: n_carr is too small to fit resource grid
+
+    Returns:
+        np.ndarray: 2D Array, sync resource grid
+    """
     if n_carr < 240 + k_ssb:
-        raise ValueError('Provided n_carr is too small. n_carr: {0}, needed: {1}'.format(n_carr,240+k_ssb))
-    
+        raise ValueError(
+            'Provided n_carr is too small. n_carr: {0}, min needed: {1}'.format(n_carr, 240+k_ssb))
 
+    # gen rgrid for sync
+    grid = get_sync_resource_grid_pbch(
+        N_RB=n_carr//12, N_ID1=N_ID1, N_ID2=N_ID2, k_ssb=k_ssb, mu=mu, f=f, shared_spectr=shared_spectr, paired_spectr=paired_spectr, pbch_data=pbch)
 
-    #find N_RB 
-    N_RB = int(n_carr//12)
-
-    #gen rgrid for sync
-    grid = get_sync_resource_grid_pbch(N_RB, N_ID1, N_ID2, k_ssb, mu, f, pbch, shared_spectr, paired_spectr)
-
-    #fit grid with N_RB*12 carr into n_carr
-    mask= np.zeros((n_carr,len(grid[0])), dtype=complex)
-    mask[:len(grid),:len(grid[0])]= grid
+    # fit grid with N_RB*12 carr into n_carr
+    mask = np.zeros((n_carr, len(grid[0])), dtype=complex)
+    mask[:len(grid), :len(grid[0])] = grid
 
     return mask
 
 
-def get_sync_resource_grid_pbch(N_RB, N_ID1, N_ID2, k_ssb, mu, f, pbch_data, shared_spectr, paired_spectr):
-    """Generate a complete resource grid with SSBs
+def get_sync_resource_grid_pbch(N_RB: int, N_ID1: int, N_ID2: int, k_ssb: int, mu: int, f: int, shared_spectr: bool, paired_spectr: bool, pbch_data: Union[np.ndarray, list]) -> np.ndarray:
+    """Produce a NR sync resource grid. 
 
     Args:
-        mu (int): Numerology
-        N_RB (int): number of Resource blocks 
-        N_ID1 (int): cell ID group
-        N_ID2 (int): cell ID sector
-        f (int): center frequency of the band
-        k_ssb (int): see See 38.211 7.4.3.1 
-        shared_spectr (bool, optional): shared spectrum channel access. Defaults to False
-        paired_spectr (bool, optional): paired spectrum operation. Defaults to False
+        N_RB (int): Number of resourceblocks to use (N_RB * 12 = N_carriers). 
+        N_ID1 (int): NID1. 
+        N_ID2 (int): NID2. 
+        k_ssb (int): Carrier offset from OffsetToPointA to SSB. 
+        mu (int): Numerology index.
+        f (int): Operating frequency.
+        shared_spectr (bool): Shared spectrum use.
+        paired_spectr (bool): Paired spectrum use.
+        pbch (Union[np.ndarray, list]): PBCH Payload bits.
 
     Returns:
-        [complex, complex]: 2D ndarray representing the produced resource grid
+        np.ndarray: 2D Array, sync resource grid
     """
 
     N_ID_Cell = 3 * N_ID1 + N_ID2
-    ssb_dim = {
-        'l': 4,
-        'k': 240,
-        'nu': N_ID_Cell % 4
-    }
+    nu = N_ID_Cell % 4
+
     N_SC, N_SYMB = get_rgrid_dimensions(mu, N_RB)
 
-    can_idxs = get_ssb_candidate_idx(mu, f, shared_spectr, paired_spectr)
-    idxs = get_ssb_idxs(can_idxs, mu, shared_spectr)
-    L__max = len(idxs)
+    can_ids = get_ssb_candidate_idx(mu, f, shared_spectr, paired_spectr)
+    ids = get_ssb_ids(can_ids, mu, shared_spectr)
+    L_max = len(ids)
     res_grid = np.zeros(shape=(N_SC, N_SYMB), dtype=complex)
 
     pbch_data = np.array(pbch_data)
-    pbch_data.resize(L__max*864)
-    pbch_data_arr = pbch_data.reshape(L__max,864)
-    
-    for i_ssb,idx in enumerate(idxs):
-        ssb_i = ssb(ssb_dim, N_ID1, N_ID2, L__max, i_ssb, pbch_data_arr[i_ssb])
+    pbch_data.resize(L_max*864)
+    pbch_data_arr = pbch_data.reshape(L_max, 864)
+
+    for i_ssb, idx in enumerate(ids):
+        ssb_i = ssb(N_ID1=N_ID1, N_ID2=N_ID2, L_max=L_max,
+                    i_ssb=i_ssb, pbch_data=pbch_data_arr[i_ssb])
         res_grid = map_ssb(res_grid, ssb_i, k_ssb, idx)
     return res_grid
 
 
-def get_rgrid_dimensions(mu, n_rb):
+def get_rgrid_dimensions(mu: int, n_rb: int) -> [int, int]:
     """Returns number of subcarriers and number of symbols in a frame. 
 
     See TS 38.211 Table 4.3.2-1,
@@ -342,33 +351,38 @@ def get_rgrid_dimensions(mu, n_rb):
     N_SLOTS_FRAME = 2 ** mu * 10
     N_SYMB_FRAME = N_SYMB_SLOT * N_SLOTS_FRAME
 
-    return (N_SC, N_SYMB_FRAME)
+    return N_SC, N_SYMB_FRAME
 
 
-def get_ssb_idxs(candidate_idxs, mu, shared_spectr):
+def get_ssb_ids(candidate_ids: Union[np.ndarray, list], mu: int, shared_spectr: bool) -> Union[np.ndarray, list]:
+    """Compute indexes of the first symbols of the the cadidate SS/PBCH blocks as per 38.213 V16.3.0 (2020-11) 4.1 Cell search
+
+    Args:
+        candidate_ids (Union[np.ndarray, list]): cadidate indices for SS/PBCH blocks
+        mu (int): Numerology index
+        shared_spectr (bool): shared spectrum channel access
+
+    Returns:
+        Union[np.ndarray, list]: List of SSB indices
+    """
     if shared_spectr:
-        if (len(candidate_idxs) == 10 and mu == 0) or (len(candidate_idxs) == 20 and mu == 1):
-            return candidate_idxs[:8]
+        if (len(candidate_ids) == 10 and mu == 0) or (len(candidate_ids) == 20 and mu == 1):
+            return candidate_ids[:8]
 
-    return candidate_idxs
+    return candidate_ids
 
 
-def get_ssb_candidate_idx(mu: int, f: int, ssca=False, paired=False):
-    """Compute indexes of the first symbols of the the cadidate SS/PBCH blocks
-    as per 
-
-    38.213 V16.3.0 (2020-11)
-
-    4.1 Cell search
+def get_ssb_candidate_idx(mu: int, f: int, ssca: bool, paired: bool) -> Union[np.ndarray, list]:
+    """Compute indexes of the first symbols of the the cadidate SS/PBCH blocks as per 38.213 V16.3.0 (2020-11) 4.1 Cell search
 
     Args:
         mu (int): Numerology index
-        f (int): Carrier frequencies (max)
-        ssca (bool, optional): shared spectrum channel access. Defaults to False.
-        paired (bool, optional): paired spectrum operation. Defaults to False.
+        f (int): Operating frequency
+        ssca (bool): Shared spectrum channel access.
+        paired (bool): Paired spectrum operation. 
 
     Returns:
-        [int]: Indexes of the first symbols of the the cadidate SS/PBCH blocks
+        Union[np.ndarray, list]: List of cadidate SSB indices 
     """
     n = []
     i = []
@@ -426,18 +440,7 @@ def get_ssb_candidate_idx(mu: int, f: int, ssca=False, paired=False):
             i = np.array([8, 12, 16, 20, 32, 36, 40, 44])
             n = np.array([0, 1, 2, 3, 5, 6, 7, 8])
             n *= 56
-    can_idxs = np.array([[a + b for a in i] for b in n], dtype=int).flatten()
-    if can_idxs is None:
-        can_idxs = np.array([], dtype=int)
-    return can_idxs
-
-
-def get_cp_length(mu, l=0,  extended_cp=False):
-    kappa = 1  # 64
-    if extended_cp:
-        return 512 * kappa * 2**(-1 * mu)
-    else:
-        if l == 0 or l == 7 * 2**mu:
-            return 144 * kappa * 2**(-1 * mu) + 16 * kappa
-        else:
-            return 144 * kappa * 2**(-1 * mu)
+    can_ids = np.array([[a + b for a in i] for b in n], dtype=int).flatten()
+    if can_ids is None:
+        can_ids = np.array([], dtype=int)
+    return can_ids

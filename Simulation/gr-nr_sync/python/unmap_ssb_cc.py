@@ -36,20 +36,13 @@ class unmap_ssb_cc(gr.sync_block):
         out2 = output_items[2]
         out3 = output_items[3]
 
-        ssb_dim = {
-            'l': 4,
-            'k': 240,
-            'nu': self.nu
-        }
-        
         for i in range(len(in0)):
             ssb = numpy.array(in0[i], dtype=complex).reshape(
                 (240, 4), order='F')
             
-            numpy.save('/home/mark/ssb.npy',ssb)
             # <+signal processing here+>
             sss_data = nrSSB.unmap_sss(ssb)
-            pbch_data, dmrs_data = nrSSB.unmap_pbch(ssb, ssb_dim)
+            pbch_data, dmrs_data = nrSSB.unmap_pbch(ssb, self.nu)
             out0[i] = sss_data
             out1[i] = pbch_data
             out2[i] = in1[i]
