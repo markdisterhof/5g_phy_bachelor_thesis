@@ -35,10 +35,12 @@ class pbch_descramble_ci(gr.sync_block):
 
         # <+signal processing here+>
         for i in range(len(in1)):
+            #print('descrambling with:', self.L__max, in0[0], in2[i],)
             out0[i] = nrSyncDecoder.decode_pbch(
                 in1[i],
                 self.L__max,
-                in0[i],
+                in0[0],
                 in2[i]
             )
+            
         return len(out0)
