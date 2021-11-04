@@ -9,7 +9,7 @@
 
 import numpy
 from gnuradio import gr
-from nr_phy_sync import nrSyncDecoder
+from nrphypy import decode
 
 
 class pbch_descramble_ci(gr.sync_block):
@@ -36,7 +36,7 @@ class pbch_descramble_ci(gr.sync_block):
         # <+signal processing here+>
         for i in range(len(in1)):
             #print('descrambling with:', self.L__max, in0[0], in2[i],)
-            out0[i] = nrSyncDecoder.decode_pbch(
+            out0[i] = decode.decode_pbch(
                 in1[i],
                 self.L__max,
                 in0[0],

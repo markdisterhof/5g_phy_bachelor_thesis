@@ -7,7 +7,7 @@
 #
 
 from gnuradio import gr, gr_unittest
-# from gnuradio import blocks
+from gnuradio import blocks
 from pbch_descramble_ci import pbch_descramble_ci
 import numpy
 

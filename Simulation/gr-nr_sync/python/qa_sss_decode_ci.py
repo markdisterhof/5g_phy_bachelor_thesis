@@ -10,6 +10,7 @@ from gnuradio import gr, gr_unittest
 # from gnuradio import blocks
 from sss_decode_ci import sss_decode_ci
 import numpy
+from nrphypy import signals
 
 class qa_sss_decode_ci(gr_unittest.TestCase):
 
@@ -26,7 +27,7 @@ class qa_sss_decode_ci(gr_unittest.TestCase):
     def run_dec(self, nid1,nid2):
         print('testing nid1,nid2', nid1,nid2)
         self.setUp()
-        sss_data = numpy.array(nrSyncSignals.sss(nid1, nid2),dtype=numpy.complex64)
+        sss_data = numpy.array(signals.sss(nid1, nid2),dtype=numpy.complex64)
         src_0 = blocks.vector_source_i([nid2],False)
         src_1 = blocks.vector_source_c(sss_data,False,127)
         dec = sss_decode_ci()

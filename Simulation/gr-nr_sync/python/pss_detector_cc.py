@@ -9,7 +9,7 @@
 
 import numpy
 from gnuradio import gr
-from nr_phy_sync import nrSyncDecoder,nrSSB
+from nrphypy import decode
 
 class pss_detector_cc(gr.basic_block):
     """
@@ -50,7 +50,7 @@ class pss_detector_cc(gr.basic_block):
             if numpy.array_equal(sample,self.last_sample):
                 continue
             self.last_sample = sample
-            NID_2, k_ssb, max_correlation = nrSyncDecoder.pss_correlate(sample)
+            NID_2, k_ssb, max_correlation = decode.pss_correlate(sample)
             
             if max_correlation >= self.threshold:  # case corr peak, output next four ofdm symbols
                 if not self.memory_idx == -1:  # case prior detected pss was not actually the one with best corr

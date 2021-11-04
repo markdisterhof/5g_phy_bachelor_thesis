@@ -9,7 +9,7 @@
 
 import numpy
 from gnuradio import gr
-from nr_phy_sync import nrSyncDecoder
+from nrphypy import decode
 
 
 class sss_decode_ci(gr.sync_block):
@@ -31,6 +31,6 @@ class sss_decode_ci(gr.sync_block):
         
         for i in range(len(in0)):
             # <+signal processing here+>
-            out0[i] = int(nrSyncDecoder.decode_sss(
+            out0[i] = int(decode.decode_sss(
                 numpy.array(in1[i], dtype=complex), in0[0][0]))
         return len(out0)

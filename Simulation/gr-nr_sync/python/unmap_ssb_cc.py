@@ -9,7 +9,7 @@
 
 import numpy
 from gnuradio import gr
-from nr_phy_sync import nrSSB
+from nrphypy import ssb
 
 class unmap_ssb_cc(gr.sync_block):
     """
@@ -37,12 +37,12 @@ class unmap_ssb_cc(gr.sync_block):
         out3 = output_items[3]
 
         for i in range(len(in0)):
-            ssb = numpy.array(in0[i], dtype=complex).reshape(
+            grid = numpy.array(in0[i], dtype=complex).reshape(
                 (240, 4), order='F')
             
             # <+signal processing here+>
-            sss_data = nrSSB.unmap_sss(ssb)
-            pbch_data, dmrs_data = nrSSB.unmap_pbch(ssb, self.nu)
+            sss_data = ssb.unmap_sss(grid)
+            pbch_data, dmrs_data = ssb.unmap_pbch(grid, self.nu)
             out0[i] = sss_data
             out1[i] = pbch_data
             out2[i] = in1[i]
